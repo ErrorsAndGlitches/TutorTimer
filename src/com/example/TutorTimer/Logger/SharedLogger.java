@@ -34,12 +34,12 @@ class SharedLogger
         return s_sharedLogger;
     }
 
-    public void log(Class className, String format, Object ... args)
+    public void log(Object object, String format, Object... args)
     {
         if (m_output != null)
         {
             String msg = String.format("%s [%s] %s: %s\n", new Date(), Thread.currentThread().getId(),
-                                       className.getSimpleName(), String.format(format, args));
+                                       object.getClass().getSimpleName(), String.format(format, args));
             try
             {
                 m_output.write(msg);

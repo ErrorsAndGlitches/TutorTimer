@@ -13,7 +13,8 @@
             android:icon="@drawable/ic_launcher">
         <activity
                 android:name="TutorTimer"
-                android:label="@string/app_name">
+                android:label="@string/app_name"
+                android:configChanges="orientation|keyboard|keyboardHidden|screenSize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>

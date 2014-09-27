@@ -31,14 +31,14 @@ class DatabaseOpener extends SQLiteOpenHelper
     public void onConfigure(SQLiteDatabase db)
     {
         super.onConfigure(db);
-        Logger.log(DatabaseOpener.class, "Configuring database %s", db.getPath());
+        Logger.log(this, "Configuring database %s", db.getPath());
         db.enableWriteAheadLogging();
     }
 
     @Override
     public void onCreate(SQLiteDatabase db)
     {
-        Logger.log(DatabaseOpener.class, "Creating database %s", db.getPath());
+        Logger.log(this, "Creating database %s", db.getPath());
         initializeDatabaseTables(db);
     }
 

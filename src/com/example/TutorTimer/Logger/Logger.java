@@ -2,13 +2,13 @@ package com.example.TutorTimer.Logger;
 
 public class Logger
 {
-    public static void log(Class className, String format, Object ... args)
+    public static void log(Object object, String format, Object ... args)
     {
-        SharedLogger.getInstance().log(className, format, args);
+        SharedLogger.getInstance().log(object, format, args);
     }
 
-    public static void log(Class className, String msg)
+    public static void log(Object object, String msg)
     {
-        SharedLogger.getInstance().log(className, msg);
+        SharedLogger.getInstance().log(object, msg);
     }
 }
