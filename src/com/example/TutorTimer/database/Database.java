@@ -1,63 +1,52 @@
 package com.example.TutorTimer.database;
 
+import android.content.ContentValues;
 import android.content.Context;
-import android.database.DatabaseErrorHandler;
 import android.database.sqlite.SQLiteDatabase;
-import android.database.sqlite.SQLiteOpenHelper;
 import com.example.TutorTimer.R;
 
-/**
- * Opens the Database
- */
-public class Database extends SQLiteOpenHelper
+public class Database
 {
-    public Database(Context context,
-                    String name,
-                    SQLiteDatabase.CursorFactory factory, int version)
+    private final SQLiteDatabase m_database;
+
+    public Database(Context context)
     {
-        super(context, name, factory, version);
+        String dbName = context.getResources().getString(R.string.db_name);
+        int dbVersion = context.getResources().getInteger(R.integer.database_version);
+        m_database = new DatabaseOpener(context, dbName, null, dbVersion).getWritableDatabase();
     }
 
-    public Database(Context context,
-                    String name,
-                    SQLiteDatabase.CursorFactory factory,
-                    int version,
-                    DatabaseErrorHandler errorHandler)
+    public Transaction beginTransaction()
     {
-        super(context, name, factory, version, errorHandler);
+        return new Transaction();
     }
 
-    @Override
-    public void onConfigure(SQLiteDatabase db)
+    // all transactions are write transactions for the moment
+    class Transaction
     {
-        super.onConfigure(db);
-        db.enableWriteAheadLogging();
-        db.setVersion(R.integer.database_version);
-    }
-
-    @Override
-    public void onCreate(SQLiteDatabase db)
-    {
-        initializeDatabaseTables(db);
-    }
-
-    @Override
-    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion)
-    {
-        // shouldn't be getting upgrades
-    }
-
-    private void initializeDatabaseTables(SQLiteDatabase db)
-    {
-        db.beginTransaction();
-        try
+        Transaction()
         {
-            db.execSQL("CREATE TABLE students(id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE);");
-            db.setTransactionSuccessful();
+            m_database.beginTransaction();
         }
-        finally
+
+        public void execSql(String sql, String[] args)
         {
-            db.endTransaction();
+            m_database.execSQL(sql, args);
+        }
+
+        public long insertOrThrow(String table, ContentValues values)
+        {
+            return m_database.insertOrThrow(table, null, values);
+        }
+
+        public void setSuccessful()
+        {
+            m_database.setTransactionSuccessful();
+        }
+
+        public void endTransaction()
+        {
+            m_database.endTransaction();
         }
     }
 }

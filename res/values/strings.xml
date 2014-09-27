@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">TutorTimer</string>
+    <string name="db_name" translatable="false">students.db</string>
 </resources>

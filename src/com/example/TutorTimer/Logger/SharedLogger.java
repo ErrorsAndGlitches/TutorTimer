@@ -70,7 +70,7 @@ class SharedLogger
         File outputFile = new File(outputLogFileName);
         try
         {
-            m_output = new FileWriter(outputFile, true);
+            m_output = new FileWriter(outputFile, false);
         }
         catch (IOException e)
         {
