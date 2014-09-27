@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">TutorTimer</string>
+    <string name="db_name" translatable="false">students.db</string>
+
+    <string name="current_students_tab_name">Current Students</string>
+    <string name="import_students_tab_name">Import Students</string>
+    <string name="debug_tab_name">Debug</string>
+</resources>
