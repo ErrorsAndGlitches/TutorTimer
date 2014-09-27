@@ -3,6 +3,8 @@ package com.example.TutorTimer;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.os.Bundle;
+import com.example.TutorTimer.Logger.Logger;
+import com.example.TutorTimer.ui.TabListener;
 
 public class TutorTimer extends Activity
 {
@@ -13,6 +15,8 @@ public class TutorTimer extends Activity
     public void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
+
+        Logger.log(TutorTimer.class, "Tutor Timer has started");
 
         ActionBar actionBar = getActionBar();
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
