@@ -15,31 +15,35 @@ public class DbUtils
         Database.Transaction transaction = database.beginTransaction();
         try
         {
-            Cursor cursor = processor.performQuery(transaction);
-            try
-            {
-                if (cursor != null && cursor.moveToFirst())
-                {
-                    while (!cursor.isAfterLast())
-                    {
-                        processor.process(cursor);
-                        cursor.moveToNext();
-                    }
-                }
-            }
-            finally
-            {
-                if (cursor != null)
-                {
-                    cursor.close();
-                }
-            }
-
+            databaseQuery(transaction, processor);
             transaction.setSuccessful();
         }
         finally
         {
             transaction.endTransaction();
+        }
+    }
+
+    public static void databaseQuery(Database.Transaction transaction, QueryProcessor processor)
+    {
+        Cursor cursor = processor.performQuery(transaction);
+        try
+        {
+            if (cursor != null && cursor.moveToFirst())
+            {
+                while (!cursor.isAfterLast())
+                {
+                    processor.process(cursor);
+                    cursor.moveToNext();
+                }
+            }
+        }
+        finally
+        {
+            if (cursor != null)
+            {
+                cursor.close();
+            }
         }
     }
 }

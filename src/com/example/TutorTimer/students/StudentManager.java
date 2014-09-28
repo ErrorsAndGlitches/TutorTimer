@@ -3,6 +3,7 @@ package com.example.TutorTimer.students;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.database.Database;
 import com.example.TutorTimer.database.DbUtils;
 
@@ -11,23 +12,56 @@ import java.util.List;
 
 public class StudentManager
 {
-    private final Database m_database;
+    private final Database                     m_database;
+    private final List<StudentManagerObserver> m_observers;
+
+    public interface StudentManagerObserver
+    {
+        public void onRosterChange();
+    }
 
     public StudentManager(Context context)
     {
         m_database = new Database(context);
+        m_observers = new LinkedList<StudentManagerObserver>();
     }
 
-    public Student addStudent(String name)
+    public void addStudent(final String name)
     {
-        long id;
+        long id = -1;
 
         Database.Transaction transaction = m_database.beginTransaction();
         try
         {
-            ContentValues values = new ContentValues();
-            values.put("name", name);
-            id = transaction.insertOrThrow("students", values);
+            // first check if the student exists already
+            final boolean[] studentExists = {false};
+            DbUtils.databaseQuery(transaction, new DbUtils.QueryProcessor()
+            {
+                @Override
+                public Cursor performQuery(Database.Transaction transaction)
+                {
+                    return transaction.query("SELECT id FROM students WHERE name = ?", new String[]{name});
+                }
+
+                @Override
+                public void process(Cursor cursor)
+                {
+                    studentExists[0] = true;
+                }
+            });
+
+            if (studentExists[0])
+            {
+                Logger.log(this, "Attempting to insert a student that already exists - ignoring");
+            }
+            else
+            {
+                // add the student
+                ContentValues values = new ContentValues();
+                values.put("name", name);
+                id = transaction.insertOrThrow("students", values);
+            }
+
             transaction.setSuccessful();
         }
         finally
@@ -35,7 +69,10 @@ public class StudentManager
             transaction.endTransaction();
         }
 
-        return new Student(id, name);
+        if (id != -1)
+        {
+            notifyObservers();
+        }
     }
 
     public List<Student> getStudents()
@@ -72,6 +109,8 @@ public class StudentManager
         {
             transaction.endTransaction();
         }
+
+        notifyObservers();
     }
 
     public void clearStudents()
@@ -85,6 +124,21 @@ public class StudentManager
         finally
         {
             transaction.endTransaction();
+        }
+
+        notifyObservers();
+    }
+
+    public void registerObserver(StudentManagerObserver observer)
+    {
+        m_observers.add(observer);
+    }
+
+    private void notifyObservers()
+    {
+        for (StudentManagerObserver observer : m_observers)
+        {
+            observer.onRosterChange();
         }
     }
 }

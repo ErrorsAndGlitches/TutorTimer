@@ -40,6 +40,11 @@ public class TutorTimer extends Activity
         TutorActionBarFactory.createActionBar(this, m_threadPool);
     }
 
+    public StudentManager getStudentManager()
+    {
+        return m_studentManager;
+    }
+
     public void addDebugStudents(View view)
     {
         m_threadPool.submit(new Runnable()
@@ -85,9 +90,17 @@ public class TutorTimer extends Activity
         m_studentManager.clearStudents();
     }
 
-    public StudentManager getStudentManager()
+    public void addNewStudent(View view)
     {
-        return m_studentManager;
+        EditText newStudentText = (EditText) findViewById(R.id.new_student_name);
+        String newStudentName = newStudentText.getText().toString();
+
+        if (newStudentName != null && newStudentName.length() != 0)
+        {
+            m_studentManager.addStudent(newStudentName);
+        }
+
+        newStudentText.setText("");
     }
 
     private void toast(String format, Object ... args)
