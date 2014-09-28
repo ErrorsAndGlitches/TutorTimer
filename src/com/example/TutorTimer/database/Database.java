@@ -2,6 +2,7 @@ package com.example.TutorTimer.database;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import com.example.TutorTimer.R;
 
@@ -22,7 +23,7 @@ public class Database
     }
 
     // all transactions are write transactions for the moment
-    class Transaction
+    public class Transaction
     {
         Transaction()
         {
@@ -37,6 +38,11 @@ public class Database
         public long insertOrThrow(String table, ContentValues values)
         {
             return m_database.insertOrThrow(table, null, values);
+        }
+
+        public Cursor query(String sql, String[] args)
+        {
+            return m_database.rawQuery(sql, args);
         }
 
         public void setSuccessful()

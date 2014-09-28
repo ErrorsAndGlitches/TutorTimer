@@ -19,18 +19,15 @@ class DebugTab extends TutorTab
         return tab;
     }
 
-    private DebugTab(Activity activity, ThreadPoolExecutor threadPool)
-    {
-        super(activity, threadPool);
-    }
-
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
     {
         Logger.log(this, "Received onTabSelected()");
-        m_activity.setContentView(m_view);
-        m_studentNames.clear();
-        m_studentNames.add("Debug options");
-        m_studentAdapter.notifyDataSetChanged();
+        m_activity.setContentView(R.layout.debug_view);
+    }
+
+    private DebugTab(Activity activity, ThreadPoolExecutor threadPool)
+    {
+        super(activity, threadPool);
     }
 }

@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.widget.ArrayAdapter;
-import android.widget.ListView;
 import com.example.TutorTimer.Logger.Logger;
 
 import java.util.LinkedList;
@@ -17,7 +16,6 @@ abstract class TutorTab implements ActionBar.TabListener
     final ThreadPoolExecutor   m_threadPool;
     final ArrayAdapter<String> m_studentAdapter;
     final List<String>         m_studentNames;
-    final ListView m_view;
 
     protected TutorTab(Activity activity, ThreadPoolExecutor threadPool)
     {
@@ -26,9 +24,6 @@ abstract class TutorTab implements ActionBar.TabListener
 
         m_studentNames = new LinkedList<String>();
         m_studentAdapter = new ArrayAdapter<String>(m_activity, android.R.layout.simple_list_item_1, m_studentNames);
-
-        m_view = new ListView(activity);
-        m_view .setAdapter(m_studentAdapter);
     }
 
     @Override

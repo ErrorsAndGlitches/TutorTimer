@@ -3,6 +3,7 @@ package com.example.TutorTimer.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.widget.ListView;
 import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
 
@@ -29,8 +30,13 @@ class ImportStudentsTab extends TutorTab
         m_studentAdapter.notifyDataSetChanged();
     }
 
+    private final ListView m_view;
+
     private ImportStudentsTab(Activity activity, ThreadPoolExecutor threadPool)
     {
         super(activity, threadPool);
+
+        m_view = new ListView(activity);
+        m_view.setAdapter(m_studentAdapter);
     }
 }

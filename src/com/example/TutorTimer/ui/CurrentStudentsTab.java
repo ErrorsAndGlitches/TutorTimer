@@ -3,8 +3,11 @@ package com.example.TutorTimer.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
+import android.widget.ListView;
 import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
+import com.example.TutorTimer.TutorTimer;
+import com.example.TutorTimer.students.Student;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -19,6 +22,8 @@ class CurrentStudentsTab extends TutorTab
         return tab;
     }
 
+    private final ListView m_view;
+
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
     {
@@ -30,6 +35,9 @@ class CurrentStudentsTab extends TutorTab
     private CurrentStudentsTab(Activity activity, ThreadPoolExecutor threadPool)
     {
         super(activity, threadPool);
+
+        m_view = new ListView(activity);
+        m_view.setAdapter(m_studentAdapter);
     }
 
     private class LoadStudentsTask implements Runnable
@@ -41,9 +49,9 @@ class CurrentStudentsTab extends TutorTab
 
             m_studentNames.clear();
 
-            for (int i = 0; i < 10; ++i)
+            for (Student student : ((TutorTimer) m_activity).getStudentManager().getStudents())
             {
-                m_studentNames.add(String.format("Student_%s", i));
+                m_studentNames.add(student.toString());
             }
 
             m_activity.runOnUiThread(new Runnable()
