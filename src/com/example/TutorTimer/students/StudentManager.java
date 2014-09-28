@@ -14,16 +14,29 @@ public class StudentManager
 {
     private final Database                     m_database;
     private final List<StudentManagerObserver> m_observers;
+    private final List<Student>                m_currentStudents;
 
     public interface StudentManagerObserver
     {
+    }
+
+    public interface RosterChangeObserver extends StudentManagerObserver
+    {
         public void onRosterChange();
+    }
+
+    public interface CurrentStudentObserver extends StudentManagerObserver
+    {
+        public void onStudentAdded(Student student);
+
+        public void onStudentRemoved(Student student);
     }
 
     public StudentManager(Context context)
     {
         m_database = new Database(context);
         m_observers = new LinkedList<StudentManagerObserver>();
+        m_currentStudents = new LinkedList<Student>();
     }
 
     public void addStudent(final String name)
@@ -71,7 +84,7 @@ public class StudentManager
 
         if (id != -1)
         {
-            notifyObservers();
+            notifyRosterChange();
         }
     }
 
@@ -110,7 +123,7 @@ public class StudentManager
             transaction.endTransaction();
         }
 
-        notifyObservers();
+        notifyRosterChange();
     }
 
     public void clearStudents()
@@ -126,7 +139,24 @@ public class StudentManager
             transaction.endTransaction();
         }
 
-        notifyObservers();
+        notifyRosterChange();
+    }
+
+    public void addToCurrentStudents(Student student)
+    {
+        m_currentStudents.add(student);
+        notifyCurrentStudentAdded(student);
+    }
+
+    public void removeFromCurrentStudents(Student student)
+    {
+        m_currentStudents.remove(student);
+        notifyCurrentStudentRemoved(student);
+    }
+
+    public List<Student> getCurrentStudents()
+    {
+        return new LinkedList<Student>(m_currentStudents);
     }
 
     public void registerObserver(StudentManagerObserver observer)
@@ -134,11 +164,36 @@ public class StudentManager
         m_observers.add(observer);
     }
 
-    private void notifyObservers()
+    private void notifyRosterChange()
     {
         for (StudentManagerObserver observer : m_observers)
         {
-            observer.onRosterChange();
+            if (observer instanceof RosterChangeObserver)
+            {
+                ((RosterChangeObserver) observer).onRosterChange();
+            }
+        }
+    }
+
+    private void notifyCurrentStudentAdded(Student student)
+    {
+        for (StudentManagerObserver observer : m_observers)
+        {
+            if (observer instanceof CurrentStudentObserver)
+            {
+                ((CurrentStudentObserver) observer).onStudentAdded(student);
+            }
+        }
+    }
+
+    private void notifyCurrentStudentRemoved(Student student)
+    {
+        for (StudentManagerObserver observer : m_observers)
+        {
+            if (observer instanceof CurrentStudentObserver)
+            {
+                ((CurrentStudentObserver) observer).onStudentRemoved(student);
+            }
         }
     }
 }

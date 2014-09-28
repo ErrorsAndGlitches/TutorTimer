@@ -10,7 +10,7 @@ public class TutorActionBarFactory
 {
     public static ActionBar createActionBar(Activity activity, ThreadPoolExecutor threadPool)
     {
-        activity.setContentView(R.layout.main);
+        activity.setContentView(R.layout.current_students_view);
         ActionBar actionBar = activity.getActionBar();
 
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);

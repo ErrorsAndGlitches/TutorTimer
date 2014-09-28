@@ -10,6 +10,8 @@ import com.example.TutorTimer.TutorTimer;
 import com.example.TutorTimer.students.Student;
 import com.example.TutorTimer.students.StudentManager;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 class ImportStudentsTab extends TutorTab
@@ -28,17 +30,24 @@ class ImportStudentsTab extends TutorTab
     {
         Logger.log(this, "Received onTabSelected()");
         m_activity.setContentView(R.layout.import_view);
-        ListView studentList = (ListView) m_activity.findViewById(R.id.student_list);
-        studentList.setAdapter(m_studentAdapter);
+
+        ListView studentList = (ListView) m_activity.findViewById(R.id.import_student_list);
+        studentList.setAdapter(m_importStudentsArrayAdapter);
 
         m_threadPool.submit(new LoadStudentsTask());
     }
+
+    final ImportStudentsArrayAdapter m_importStudentsArrayAdapter;
+    final List<Student>              m_importableStudents;
 
     private ImportStudentsTab(final Activity activity, ThreadPoolExecutor threadPool)
     {
         super(activity, threadPool);
 
-        ((TutorTimer) activity).getStudentManager().registerObserver(new StudentManager.StudentManagerObserver()
+        m_importableStudents = new LinkedList<Student>();
+        m_importStudentsArrayAdapter = new ImportStudentsArrayAdapter(activity, R.layout.import_student_entry, m_importableStudents);
+
+        ((TutorTimer) activity).getStudentManager().registerObserver(new StudentManager.RosterChangeObserver()
         {
             @Override
             public void onRosterChange()
@@ -55,19 +64,21 @@ class ImportStudentsTab extends TutorTab
         {
             Logger.log(this, "Loading students");
 
-            m_studentNames.clear();
-
-            for (Student student : ((TutorTimer) m_activity).getStudentManager().getStudents())
-            {
-                m_studentNames.add(student.toString());
-            }
+            final List<Student> allStudents = ((TutorTimer) m_activity).getStudentManager().getStudents();
 
             m_activity.runOnUiThread(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    m_studentAdapter.notifyDataSetChanged();
+                    m_importableStudents.clear();
+
+                    for (Student student : allStudents)
+                    {
+                        m_importableStudents.add(student);
+                    }
+
+                    m_importStudentsArrayAdapter.notifyDataSetChanged();
                 }
             });
         }
