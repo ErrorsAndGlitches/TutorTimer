@@ -80,6 +80,11 @@ public class TutorTimer extends Activity
         });
     }
 
+    public void clearStudents(View view)
+    {
+        m_studentManager.clearStudents();
+    }
+
     public StudentManager getStudentManager()
     {
         return m_studentManager;

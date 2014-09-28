@@ -59,4 +59,32 @@ public class StudentManager
 
         return students;
     }
+
+    public void deleteStudent(String name)
+    {
+        Database.Transaction transaction = m_database.beginTransaction();
+        try
+        {
+            transaction.execSql("DELETE FROM students WHERE name = ?", new String[]{name});
+            transaction.setSuccessful();
+        }
+        finally
+        {
+            transaction.endTransaction();
+        }
+    }
+
+    public void clearStudents()
+    {
+        Database.Transaction transaction = m_database.beginTransaction();
+        try
+        {
+            transaction.execSql("DELETE FROM students");
+            transaction.setSuccessful();
+        }
+        finally
+        {
+            transaction.endTransaction();
+        }
+    }
 }

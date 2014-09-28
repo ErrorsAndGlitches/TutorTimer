@@ -30,6 +30,11 @@ public class Database
             m_database.beginTransaction();
         }
 
+        public void execSql(String sql)
+        {
+            m_database.execSQL(sql);
+        }
+
         public void execSql(String sql, String[] args)
         {
             m_database.execSQL(sql, args);
