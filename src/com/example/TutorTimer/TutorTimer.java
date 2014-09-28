@@ -3,7 +3,7 @@ package com.example.TutorTimer;
 import android.app.Activity;
 import android.os.Bundle;
 import com.example.TutorTimer.Logger.Logger;
-import com.example.TutorTimer.ui.TutorActionBar;
+import com.example.TutorTimer.ui.TutorActionBarFactory;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -30,6 +30,6 @@ public class TutorTimer extends Activity
     {
         super.onCreate(savedInstanceState);
         Logger.log(this, "Tutor Timer has started");
-        TutorActionBar.initializeActionBar(this, m_threadPool);
+        TutorActionBarFactory.createActionBar(this, m_threadPool);
     }
 }
