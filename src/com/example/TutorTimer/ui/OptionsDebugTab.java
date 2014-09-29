@@ -7,13 +7,13 @@ import com.example.TutorTimer.R;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-class DebugTab extends TutorTab
+class OptionsDebugTab extends TutorTab
 {
-    static ActionBar.Tab addDebugTabToActionBar(ActionBar actionBar, Activity activity, ThreadPoolExecutor threadPool)
+    static ActionBar.Tab addOptionsDebugTabToActionBar(ActionBar actionBar, Activity activity, ThreadPoolExecutor threadPool)
     {
         ActionBar.Tab tab = actionBar.newTab();
-        tab.setText(activity.getResources().getString(R.string.debug_tab_name));
-        tab.setTabListener(new DebugTab(activity, threadPool));
+        tab.setText(activity.getResources().getString(R.string.options_debug_tab_name));
+        tab.setTabListener(new OptionsDebugTab(activity, threadPool));
         actionBar.addTab(tab);
         return tab;
     }
@@ -21,10 +21,10 @@ class DebugTab extends TutorTab
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
     {
-        m_activity.setContentView(R.layout.debug_view);
+        m_activity.setContentView(R.layout.options_debug_view);
     }
 
-    private DebugTab(Activity activity, ThreadPoolExecutor threadPool)
+    private OptionsDebugTab(Activity activity, ThreadPoolExecutor threadPool)
     {
         super(activity, threadPool);
     }

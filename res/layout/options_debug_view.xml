@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:orientation="vertical"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent">
+
+    <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/add_debug_students_button"
+                android:id="@+id/num_debug_students"
+                android:hint="Number of debug students to add (default: 10)"
+                android:inputType="number"/>
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:id="@+id/add_debug_students_button"
+                android:text="Add students"
+                android:onClick="addDebugStudents"/>
+
+    </RelativeLayout>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right"
+            android:text="Clear students"
+            android:onClick="clearStudents"/>
+
+    <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+        <EditText
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@+id/set_reset_duration_button"
+                android:id="@+id/reset_duration_seconds"
+                android:hint="Set the default reset duration (seconds)"
+                android:inputType="number"/>
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:id="@+id/set_reset_duration_button"
+                android:text="Set Reset Duration"
+                android:onClick="onSetResetDuration"/>
+
+    </RelativeLayout>
+
+</LinearLayout>

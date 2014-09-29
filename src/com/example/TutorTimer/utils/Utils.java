@@ -7,17 +7,27 @@ public final class Utils
 {
     public static void shortToast(Context context, String format, Object... args)
     {
-        toast(context, Toast.LENGTH_SHORT, format, args);
+        toast(context, Toast.LENGTH_SHORT, String.format(format, args));
     }
 
     public static void longToast(Context context, String format, Object... args)
     {
-        toast(context, Toast.LENGTH_LONG, format, args);
+        toast(context, Toast.LENGTH_LONG, String.format(format, args));
     }
 
-    private static void toast(Context context, int duration, String format, Object... args)
+    public static void shortToast(Context context, String msg)
     {
-        Toast.makeText(context, String.format(format, args), duration).show();
+        toast(context, Toast.LENGTH_SHORT, msg);
+    }
+
+    public static void longToast(Context context, String msg)
+    {
+        toast(context, Toast.LENGTH_LONG, msg);
+    }
+
+    private static void toast(Context context, int duration, String msg)
+    {
+        Toast.makeText(context, msg, duration).show();
     }
 
     private Utils()

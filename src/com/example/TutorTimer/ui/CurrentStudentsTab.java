@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 class CurrentStudentsTab extends TutorTab
 {
-    private static final long UI_UPDATE_RATE_MS = 500; // 0.5 seconds since 1 second can be jarring on the UI
+    private static final long UI_UPDATE_RATE_MS = 500; // 0.5 seconds so the count down is smooth
 
     static ActionBar.Tab addCurrentStudentsTabToActionBar(ActionBar actionBar,
                                                           Activity activity,

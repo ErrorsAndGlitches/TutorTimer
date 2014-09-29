@@ -18,7 +18,7 @@ public class TutorActionBarFactory
 
         CurrentStudentsTab.addCurrentStudentsTabToActionBar(actionBar, activity, threadPool);
         ImportStudentsTab.addImportStudentsTabToActionBar(actionBar, activity, threadPool);
-        DebugTab.addDebugTabToActionBar(actionBar, activity, threadPool);
+        OptionsDebugTab.addOptionsDebugTabToActionBar(actionBar, activity, threadPool);
 
         return actionBar;
     }

@@ -6,6 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.students.StudentManager;
+import com.example.TutorTimer.timer.TimerFactory;
 import com.example.TutorTimer.ui.TutorActionBarFactory;
 import com.example.TutorTimer.utils.Utils;
 
@@ -49,7 +50,7 @@ public class TutorTimer extends Activity
             {
                 Logger.log(this, "Adding debug students");
 
-                EditText numStudentsView = (EditText) findViewById(R.id.num_debug_students);
+                final EditText numStudentsView = (EditText) findViewById(R.id.num_debug_students);
                 String numStudentsStr = numStudentsView.getText().toString();
 
                 int numStudentsToAdd = 0;
@@ -71,11 +72,22 @@ public class TutorTimer extends Activity
                     numStudentsToAdd = getResources().getInteger(R.integer.default_num_debug_students);
                 }
 
-                Logger.log(this, "Adding %d debug students", numStudentsToAdd);
+                final String msg = String.format("Adding %d debug students", numStudentsToAdd);
+                Logger.log(this, msg);
                 for (int i = 0; i < numStudentsToAdd; ++i)
                 {
                     m_studentManager.addStudent(String.format("Student_%d", System.nanoTime()));
                 }
+
+                runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        numStudentsView.setText("");
+                        Utils.shortToast(TutorTimer.this, msg);
+                    }
+                });
             }
         });
     }
@@ -96,5 +108,33 @@ public class TutorTimer extends Activity
         }
 
         newStudentText.setText("");
+    }
+
+    public void onSetResetDuration(View view)
+    {
+        EditText resetEditTextView = (EditText) findViewById(R.id.reset_duration_seconds);
+        String newResetDurationStr = resetEditTextView.getText().toString();
+
+        if (newResetDurationStr.length() != 0)
+        {
+            try
+            {
+                int newResetDuration = Integer.parseInt(newResetDurationStr);
+
+                if (newResetDuration >= 0)
+                {
+                    TimerFactory.getInstance(this).setResetDurationSec(newResetDuration);
+                    Utils.shortToast(this, "Set reset duration to %d seconds", newResetDuration);
+                }
+                else
+                {
+                    Logger.log(this, "User tried to set the reset duration to a negative number %d", newResetDuration);
+                }
+            }
+            catch (NumberFormatException e)
+            {
+                Logger.log(this, "Could not update the reset duration with input %s", newResetDurationStr);
+            }
+        }
     }
 }
