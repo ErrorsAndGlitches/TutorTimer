@@ -3,7 +3,6 @@ package com.example.TutorTimer.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
@@ -26,14 +25,16 @@ class CurrentStudentsTab extends TutorTab
         return tab;
     }
 
-    private final ArrayAdapter<Student> m_currentStudentsAdapter;
-    private final List<Student>         m_currentStudents;
+    private final CurrentStudentsArrayAdapter m_currentStudentsAdapter;
+    private final List<Student>               m_currentStudents;
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
     {
         Logger.log(this, "Received onTabSelected()");
         m_activity.setContentView(R.layout.current_students_view);
+        ListView currentStudentList = (ListView) m_activity.findViewById(R.id.current_student_list);
+        currentStudentList.setAdapter(m_currentStudentsAdapter);
     }
 
     private CurrentStudentsTab(Activity activity, ThreadPoolExecutor threadPool)
@@ -41,7 +42,7 @@ class CurrentStudentsTab extends TutorTab
         super(activity, threadPool);
 
         m_currentStudents = new LinkedList<Student>();
-        m_currentStudentsAdapter = new ArrayAdapter<Student>(activity, R.layout.current_students_view, m_currentStudents);
+        m_currentStudentsAdapter = new CurrentStudentsArrayAdapter(activity, R.layout.current_students_view, m_currentStudents);
 
         ListView currentStudentList = (ListView) activity.findViewById(R.id.current_student_list);
         currentStudentList.setAdapter(m_currentStudentsAdapter);
@@ -51,6 +52,7 @@ class CurrentStudentsTab extends TutorTab
             @Override
             public void onStudentAdded(Student student)
             {
+                Logger.log(this, "Adding %s to the current student list", student);
                 m_currentStudents.add(student);
                 m_threadPool.submit(new LoadCurrentStudentsTask());
             }
@@ -58,6 +60,7 @@ class CurrentStudentsTab extends TutorTab
             @Override
             public void onStudentRemoved(Student student)
             {
+                Logger.log(this, "Removing %s from the current student list", student);
                 m_currentStudents.remove(student);
                 m_threadPool.submit(new LoadCurrentStudentsTask());
             }

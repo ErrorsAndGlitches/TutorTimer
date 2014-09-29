@@ -14,16 +14,23 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@+id/reset_timer_button"
             android:id="@+id/time_left_for_student"/>
 
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@+id/remove_current_student"
             android:text="Reset Timer"
             android:id="@+id/reset_timer_button"
+            android:onClick="resetTimer"/>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="Remove Student"
+            android:id="@+id/remove_current_student"
             android:onClick="resetTimer"/>
 
 </RelativeLayout>
