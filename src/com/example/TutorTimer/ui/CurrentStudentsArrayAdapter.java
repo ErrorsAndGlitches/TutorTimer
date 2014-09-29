@@ -11,21 +11,27 @@ import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
 import com.example.TutorTimer.students.Student;
 import com.example.TutorTimer.students.StudentManager;
+import com.example.TutorTimer.ui.CurrentStudentsArrayAdapter.CurrentStudentEntry;
+import com.example.TutorTimer.timer.Timer;
+import com.example.TutorTimer.timer.TimerFactory;
 
 import java.util.List;
 
-public class CurrentStudentsArrayAdapter extends ArrayAdapter<Student>
+public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntry>
 {
     private final StudentManager m_studentManager;
+    private final TimerFactory   m_timerFactory;
 
-    public CurrentStudentsArrayAdapter(Context context, int resource, List<Student> objects)
+    public CurrentStudentsArrayAdapter(Context context, int resource, List<CurrentStudentEntry> objects)
     {
         super(context, resource, objects);
         m_studentManager = StudentManager.getInstance(context);
+        m_timerFactory = TimerFactory.getInstance(context);
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View rowView;
@@ -44,7 +50,9 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<Student>
                 @Override
                 public void onClick(View v)
                 {
-                    Logger.log(this, "Resetting timer for %s", v.getTag());
+                    Timer timer = (Timer) v.getTag();
+                    timer.setResetDurationSec(m_timerFactory.getResetDurationSec());
+                    timer.reset();
                 }
             });
 
@@ -68,25 +76,56 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<Student>
 
         ViewHolder viewHolder = (ViewHolder) rowView.getTag();
 
-        Student student = getItem(position);
-        viewHolder.student = student;
+        CurrentStudentEntry currentStudentEntry = getItem(position);
+        Student student = currentStudentEntry.student;
 
         TextView studentNameTextView = viewHolder.studentName;
         studentNameTextView.setText(student.toString());
 
+        Timer timer = currentStudentEntry.timer;
         TextView timeLeftTextView = viewHolder.timeLeft;
-        timeLeftTextView.setText("0:00");
+        timeLeftTextView.setText(timer.toString());
 
         // add the student to the button's tag since the info will be needed in the onClick()
-        viewHolder.resetTimerButton.setTag(student);
+        viewHolder.resetTimerButton.setTag(timer);
         viewHolder.removeFromCurrentStudentsButton.setTag(student);
 
         return rowView;
     }
 
+    public static class CurrentStudentEntry
+    {
+        public final Student student;
+        public final Timer   timer;
+
+        public CurrentStudentEntry(Student student, Timer timer)
+        {
+            this.student = student;
+            this.timer = timer;
+        }
+
+        @Override
+        public boolean equals(Object o)
+        {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            CurrentStudentEntry that = (CurrentStudentEntry) o;
+
+            if (student != null ? !student.equals(that.student) : that.student != null) return false;
+
+            return true;
+        }
+
+        @Override
+        public int hashCode()
+        {
+            return student != null ? student.hashCode() : 0;
+        }
+    }
+
     private static final class ViewHolder
     {
-        Student  student;
         TextView studentName;
         TextView timeLeft;
         Button   resetTimerButton;

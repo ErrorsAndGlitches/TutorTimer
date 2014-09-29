@@ -2,4 +2,5 @@
 <resources>
     <integer name="database_version">1</integer>
     <integer name="default_num_debug_students">10</integer>
+    <integer name="default_timer_duration_sec">300</integer>
 </resources>
