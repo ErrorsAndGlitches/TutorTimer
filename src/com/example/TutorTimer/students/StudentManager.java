@@ -12,6 +12,8 @@ import java.util.List;
 
 public class StudentManager
 {
+    private static StudentManager s_studentManager;
+
     private final Database                     m_database;
     private final List<StudentManagerObserver> m_observers;
     private final List<Student>                m_currentStudents;
@@ -32,11 +34,20 @@ public class StudentManager
         public void onStudentRemoved(Student student);
     }
 
-    public StudentManager(Context context)
+    public static StudentManager getInstance(Context context)
     {
-        m_database = new Database(context);
-        m_observers = new LinkedList<StudentManagerObserver>();
-        m_currentStudents = new LinkedList<Student>();
+        if (s_studentManager == null)
+        {
+            synchronized (StudentManager.class)
+            {
+                if (s_studentManager == null)
+                {
+                    s_studentManager = new StudentManager(context);
+                }
+            }
+        }
+
+        return s_studentManager;
     }
 
     public void addStudent(final String name)
@@ -162,6 +173,13 @@ public class StudentManager
     public void registerObserver(StudentManagerObserver observer)
     {
         m_observers.add(observer);
+    }
+
+    private StudentManager(Context context)
+    {
+        m_database = new Database(context);
+        m_observers = new LinkedList<StudentManagerObserver>();
+        m_currentStudents = new LinkedList<Student>();
     }
 
     private void notifyRosterChange()

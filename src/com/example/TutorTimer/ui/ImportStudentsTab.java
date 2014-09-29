@@ -6,7 +6,6 @@ import android.app.FragmentTransaction;
 import android.widget.ListView;
 import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
-import com.example.TutorTimer.TutorTimer;
 import com.example.TutorTimer.students.Student;
 import com.example.TutorTimer.students.StudentManager;
 
@@ -47,7 +46,7 @@ class ImportStudentsTab extends TutorTab
         m_importableStudents = new LinkedList<Student>();
         m_importStudentsArrayAdapter = new ImportStudentsArrayAdapter(activity, R.layout.import_student_entry, m_importableStudents);
 
-        ((TutorTimer) activity).getStudentManager().registerObserver(new StudentManager.RosterChangeObserver()
+        m_studentManager.registerObserver(new StudentManager.RosterChangeObserver()
         {
             @Override
             public void onRosterChange()
@@ -64,7 +63,7 @@ class ImportStudentsTab extends TutorTab
         {
             Logger.log(this, "Loading students");
 
-            final List<Student> allStudents = ((TutorTimer) m_activity).getStudentManager().getStudents();
+            final List<Student> allStudents = m_studentManager.getStudents();
 
             m_activity.runOnUiThread(new Runnable()
             {

@@ -9,16 +9,19 @@ import android.widget.Button;
 import android.widget.TextView;
 import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
-import com.example.TutorTimer.TutorTimer;
 import com.example.TutorTimer.students.Student;
+import com.example.TutorTimer.students.StudentManager;
 
 import java.util.List;
 
 public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
 {
+    private final StudentManager m_studentManager;
+
     public ImportStudentsArrayAdapter(Context context, int resource, List<Student> objects)
     {
         super(context, resource, objects);
+        m_studentManager = StudentManager.getInstance(context);
     }
 
     @Override
@@ -41,7 +44,7 @@ public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
                 {
                     Student student = (Student) v.getTag();
                     Logger.log(this, "Import button for student %s was clicked", student);
-                    ((TutorTimer) ImportStudentsArrayAdapter.this.getContext()).getStudentManager().addToCurrentStudents(student);
+                    m_studentManager.addToCurrentStudents(student);
                 }
             });
 

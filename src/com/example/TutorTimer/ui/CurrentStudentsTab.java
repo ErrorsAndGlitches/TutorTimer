@@ -6,7 +6,6 @@ import android.app.FragmentTransaction;
 import android.widget.ListView;
 import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
-import com.example.TutorTimer.TutorTimer;
 import com.example.TutorTimer.students.Student;
 import com.example.TutorTimer.students.StudentManager;
 
@@ -16,7 +15,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 
 class CurrentStudentsTab extends TutorTab
 {
-    static ActionBar.Tab addCurrentStudentsTabToActionBar(ActionBar actionBar, Activity activity, ThreadPoolExecutor threadPool)
+    static ActionBar.Tab addCurrentStudentsTabToActionBar(ActionBar actionBar,
+                                                          Activity activity,
+                                                          ThreadPoolExecutor threadPool)
     {
         ActionBar.Tab tab = actionBar.newTab();
         tab.setText(activity.getResources().getString(R.string.current_students_tab_name));
@@ -47,7 +48,7 @@ class CurrentStudentsTab extends TutorTab
         ListView currentStudentList = (ListView) activity.findViewById(R.id.current_student_list);
         currentStudentList.setAdapter(m_currentStudentsAdapter);
 
-        ((TutorTimer) activity).getStudentManager().registerObserver(new StudentManager.CurrentStudentObserver()
+        m_studentManager.registerObserver(new StudentManager.CurrentStudentObserver()
         {
             @Override
             public void onStudentAdded(Student student)

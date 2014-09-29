@@ -36,13 +36,8 @@ public class TutorTimer extends Activity
     {
         super.onCreate(savedInstanceState);
         Logger.log(this, "Tutor Timer has started");
-        m_studentManager = new StudentManager(this);
+        m_studentManager = StudentManager.getInstance(this);
         TutorActionBarFactory.createActionBar(this, m_threadPool);
-    }
-
-    public StudentManager getStudentManager()
-    {
-        return m_studentManager;
     }
 
     public void addDebugStudents(View view)
