@@ -14,9 +14,15 @@
     <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_toLeftOf="@+id/delete_student_button"
             android:text="Import Student"
-            android:id="@+id/import_student_button"
-            android:onClick="importStudent"/>
+            android:id="@+id/import_student_button"/>
+
+    <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentRight="true"
+            android:text="Delete Student"
+            android:id="@+id/delete_student_button"/>
 
 </RelativeLayout>

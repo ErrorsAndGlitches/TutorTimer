@@ -121,12 +121,12 @@ public class StudentManager
         return students;
     }
 
-    public void deleteStudent(String name)
+    public void deleteStudent(long id)
     {
         Database.Transaction transaction = m_database.beginTransaction();
         try
         {
-            transaction.execSql("DELETE FROM students WHERE name = ?", new String[]{name});
+            transaction.execSql("DELETE FROM students WHERE id = ?", new String[]{String.valueOf(id)});
             transaction.setSuccessful();
         }
         finally

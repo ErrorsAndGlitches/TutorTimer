@@ -98,16 +98,6 @@ public class TutorTimer extends Activity
         newStudentText.setText("");
     }
 
-    public void resetTimer(View view)
-    {
-        Logger.log(this, "Resetting the timer for student ?");
-    }
-
-    public void importStudent(View view)
-    {
-        Logger.log(this, "Importing student ?");
-    }
-
     private void toast(String format, Object ... args)
     {
         Toast.makeText(this, String.format(format, args), Toast.LENGTH_LONG);

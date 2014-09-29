@@ -25,7 +25,8 @@ public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
     }
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
+    public View getView(int position, View convertView, ViewGroup parent)
+    {
         LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         View rowView;
@@ -36,6 +37,7 @@ public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
             ViewHolder viewHolder = new ViewHolder();
             viewHolder.studentName = (TextView) rowView.findViewById(R.id.import_student_name);
             viewHolder.addToCurrentStudentsButton = (Button) rowView.findViewById(R.id.import_student_button);
+            viewHolder.deleteStudentButton = (Button) rowView.findViewById(R.id.delete_student_button);
 
             viewHolder.addToCurrentStudentsButton.setOnClickListener(new View.OnClickListener()
             {
@@ -43,8 +45,19 @@ public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
                 public void onClick(View v)
                 {
                     Student student = (Student) v.getTag();
-                    Logger.log(this, "Import button for student %s was clicked", student);
+                    Logger.log(this, "Importing student %s", student);
                     m_studentManager.addToCurrentStudents(student);
+                }
+            });
+
+            viewHolder.deleteStudentButton.setOnClickListener(new View.OnClickListener()
+            {
+                @Override
+                public void onClick(View v)
+                {
+                    Student student = (Student) v.getTag();
+                    Logger.log(this, "Deleting student %s", student);
+                    m_studentManager.deleteStudent(student.getId());
                 }
             });
 
@@ -65,6 +78,7 @@ public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
 
         // add the student to the button's tag since the info will be needed in the onClick()
         viewHolder.addToCurrentStudentsButton.setTag(student);
+        viewHolder.deleteStudentButton.setTag(student);
 
         return rowView;
     }
@@ -74,5 +88,6 @@ public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
         Student  student;
         TextView studentName;
         Button   addToCurrentStudentsButton;
+        Button   deleteStudentButton;
     }
 }
