@@ -4,7 +4,6 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.widget.ListView;
-import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
 import com.example.TutorTimer.students.Student;
 import com.example.TutorTimer.students.StudentManager;
@@ -32,7 +31,6 @@ class CurrentStudentsTab extends TutorTab
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
     {
-        Logger.log(this, "Received onTabSelected()");
         m_activity.setContentView(R.layout.current_students_view);
         ListView currentStudentList = (ListView) m_activity.findViewById(R.id.current_student_list);
         currentStudentList.setAdapter(m_currentStudentsAdapter);

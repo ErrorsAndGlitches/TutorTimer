@@ -11,6 +11,7 @@ import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
 import com.example.TutorTimer.students.Student;
 import com.example.TutorTimer.students.StudentManager;
+import com.example.TutorTimer.utils.Utils;
 
 import java.util.List;
 
@@ -45,7 +46,9 @@ public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
                 public void onClick(View v)
                 {
                     Student student = (Student) v.getTag();
-                    Logger.log(this, "Importing student %s", student);
+                    String msg = String.format("Importing student %s", student);
+                    Logger.log(this, msg);
+                    Utils.shortToast(getContext(), msg);
                     m_studentManager.addToCurrentStudents(student);
                 }
             });

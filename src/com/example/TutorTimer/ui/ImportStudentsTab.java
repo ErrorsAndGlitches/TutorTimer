@@ -27,7 +27,6 @@ class ImportStudentsTab extends TutorTab
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
     {
-        Logger.log(this, "Received onTabSelected()");
         m_activity.setContentView(R.layout.import_view);
 
         ListView studentList = (ListView) m_activity.findViewById(R.id.import_student_list);

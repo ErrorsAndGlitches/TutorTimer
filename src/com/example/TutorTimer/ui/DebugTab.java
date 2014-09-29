@@ -3,7 +3,6 @@ package com.example.TutorTimer.ui;
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
-import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
 
 import java.util.concurrent.ThreadPoolExecutor;
@@ -22,7 +21,6 @@ class DebugTab extends TutorTab
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
     {
-        Logger.log(this, "Received onTabSelected()");
         m_activity.setContentView(R.layout.debug_view);
     }
 

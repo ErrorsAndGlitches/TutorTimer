@@ -4,10 +4,10 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import android.widget.Toast;
 import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.students.StudentManager;
 import com.example.TutorTimer.ui.TutorActionBarFactory;
+import com.example.TutorTimer.utils.Utils;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -61,7 +61,7 @@ public class TutorTimer extends Activity
                     }
                     catch (NumberFormatException e)
                     {
-                        toast("Could not create debug students; invalid arg %s", numStudentsStr);
+                        Utils.longToast(TutorTimer.this, "Could not create debug students; invalid arg %s", numStudentsStr);
                     }
 
                     numStudentsToAdd = Math.max(numStudentsToAdd, 0);
@@ -96,10 +96,5 @@ public class TutorTimer extends Activity
         }
 
         newStudentText.setText("");
-    }
-
-    private void toast(String format, Object ... args)
-    {
-        Toast.makeText(this, String.format(format, args), Toast.LENGTH_LONG);
     }
 }
