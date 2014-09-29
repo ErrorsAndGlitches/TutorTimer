@@ -53,7 +53,6 @@ class CurrentStudentsTab extends TutorTab
             @Override
             public void onStudentAdded(Student student)
             {
-                Logger.log(this, "Adding %s to the current student list", student);
                 m_currentStudents.add(student);
                 m_threadPool.submit(new LoadCurrentStudentsTask());
             }
@@ -61,7 +60,6 @@ class CurrentStudentsTab extends TutorTab
             @Override
             public void onStudentRemoved(Student student)
             {
-                Logger.log(this, "Removing %s from the current student list", student);
                 m_currentStudents.remove(student);
                 m_threadPool.submit(new LoadCurrentStudentsTask());
             }

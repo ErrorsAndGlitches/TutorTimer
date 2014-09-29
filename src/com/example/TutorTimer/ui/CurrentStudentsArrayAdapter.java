@@ -10,14 +10,18 @@ import android.widget.TextView;
 import com.example.TutorTimer.Logger.Logger;
 import com.example.TutorTimer.R;
 import com.example.TutorTimer.students.Student;
+import com.example.TutorTimer.students.StudentManager;
 
 import java.util.List;
 
 public class CurrentStudentsArrayAdapter extends ArrayAdapter<Student>
 {
+    private final StudentManager m_studentManager;
+
     public CurrentStudentsArrayAdapter(Context context, int resource, List<Student> objects)
     {
         super(context, resource, objects);
+        m_studentManager = StudentManager.getInstance(context);
     }
 
     @Override
@@ -49,7 +53,9 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<Student>
                 @Override
                 public void onClick(View v)
                 {
-                    Logger.log(this, "Removing %s from current student list", v.getTag());
+                    Student student = (Student) v.getTag();
+                    Logger.log(this, "Removing %s from current student list", student);
+                    m_studentManager.removeFromCurrentStudents(student);
                 }
             });
 

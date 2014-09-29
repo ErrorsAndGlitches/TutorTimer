@@ -164,7 +164,7 @@ public class StudentManager
 
     public void removeFromCurrentStudents(Student student)
     {
-        if (!m_currentStudents.contains(student))
+        if (m_currentStudents.contains(student))
         {
             m_currentStudents.remove(student);
             notifyCurrentStudentRemoved(student);
