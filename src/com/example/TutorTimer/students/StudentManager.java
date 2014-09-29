@@ -155,14 +155,20 @@ public class StudentManager
 
     public void addToCurrentStudents(Student student)
     {
-        m_currentStudents.add(student);
-        notifyCurrentStudentAdded(student);
+        if (!m_currentStudents.contains(student))
+        {
+            m_currentStudents.add(student);
+            notifyCurrentStudentAdded(student);
+        }
     }
 
     public void removeFromCurrentStudents(Student student)
     {
-        m_currentStudents.remove(student);
-        notifyCurrentStudentRemoved(student);
+        if (!m_currentStudents.contains(student))
+        {
+            m_currentStudents.remove(student);
+            notifyCurrentStudentRemoved(student);
+        }
     }
 
     public List<Student> getCurrentStudents()
