@@ -1,14 +1,14 @@
-package com.example.TutorTimer.ui;
+package com.TutorTimer.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.widget.ListView;
-import com.example.TutorTimer.R;
-import com.example.TutorTimer.students.Student;
-import com.example.TutorTimer.students.StudentManager;
-import com.example.TutorTimer.timer.TimerFactory;
-import com.example.TutorTimer.ui.CurrentStudentsArrayAdapter.CurrentStudentEntry;
+import com.TutorTimer.R;
+import com.TutorTimer.students.Student;
+import com.TutorTimer.students.StudentManager;
+import com.TutorTimer.timer.TimerFactory;
+import com.TutorTimer.ui.CurrentStudentsArrayAdapter.CurrentStudentEntry;
 
 import java.util.LinkedList;
 import java.util.concurrent.ScheduledFuture;

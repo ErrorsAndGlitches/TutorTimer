@@ -1,11 +1,11 @@
-package com.example.TutorTimer.students;
+package com.TutorTimer.students;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import com.example.TutorTimer.Logger.Logger;
-import com.example.TutorTimer.database.Database;
-import com.example.TutorTimer.database.DbUtils;
+import com.TutorTimer.Logger.Logger;
+import com.TutorTimer.database.Database;
+import com.TutorTimer.database.DbUtils;
 
 import java.util.LinkedList;
 import java.util.List;

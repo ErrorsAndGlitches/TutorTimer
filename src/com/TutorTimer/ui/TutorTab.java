@@ -1,9 +1,9 @@
-package com.example.TutorTimer.ui;
+package com.TutorTimer.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
-import com.example.TutorTimer.students.StudentManager;
+import com.TutorTimer.students.StudentManager;
 
 import java.util.concurrent.ThreadPoolExecutor;
 

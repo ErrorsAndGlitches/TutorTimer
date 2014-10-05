@@ -1,4 +1,4 @@
-package com.example.TutorTimer.Logger;
+package com.TutorTimer.Logger;
 
 public class Logger
 {

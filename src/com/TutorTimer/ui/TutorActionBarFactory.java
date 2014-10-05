@@ -1,8 +1,8 @@
-package com.example.TutorTimer.ui;
+package com.TutorTimer.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
-import com.example.TutorTimer.R;
+import com.TutorTimer.R;
 
 import java.util.concurrent.ThreadPoolExecutor;
 

@@ -1,13 +1,13 @@
-package com.example.TutorTimer.ui;
+package com.TutorTimer.ui;
 
 import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.widget.ListView;
-import com.example.TutorTimer.Logger.Logger;
-import com.example.TutorTimer.R;
-import com.example.TutorTimer.students.Student;
-import com.example.TutorTimer.students.StudentManager;
+import com.TutorTimer.Logger.Logger;
+import com.TutorTimer.R;
+import com.TutorTimer.students.Student;
+import com.TutorTimer.students.StudentManager;
 
 import java.util.LinkedList;
 import java.util.List;

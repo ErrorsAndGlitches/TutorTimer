@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          package="com.example.TutorTimer"
+          package="com.TutorTimer"
           android:versionCode="1"
           android:versionName="1.0">
 
@@ -12,7 +12,7 @@
             android:label="@string/app_name"
             android:icon="@drawable/ic_launcher">
         <activity
-                android:name="TutorTimer"
+                android:name="com.TutorTimer.TutorTimer"
                 android:label="@string/app_name"
                 android:configChanges="orientation|keyboard|keyboardHidden|screenSize">
             <intent-filter>

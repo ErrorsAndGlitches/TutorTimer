@@ -1,4 +1,4 @@
-package com.example.TutorTimer.utils;
+package com.TutorTimer.utils;
 
 import android.content.Context;
 import android.widget.Toast;

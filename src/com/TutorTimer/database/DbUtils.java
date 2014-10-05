@@ -1,4 +1,4 @@
-package com.example.TutorTimer.database;
+package com.TutorTimer.database;
 
 import android.database.Cursor;
 

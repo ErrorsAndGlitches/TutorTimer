@@ -1,4 +1,4 @@
-package com.example.TutorTimer.timer;
+package com.TutorTimer.timer;
 
 import java.util.Date;
 

@@ -1,9 +1,9 @@
-package com.example.TutorTimer.database;
+package com.TutorTimer.database;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import com.example.TutorTimer.Logger.Logger;
+import com.TutorTimer.Logger.Logger;
 
 /**
  * Opens the Database

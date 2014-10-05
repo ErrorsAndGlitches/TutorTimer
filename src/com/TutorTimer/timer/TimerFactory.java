@@ -1,7 +1,7 @@
-package com.example.TutorTimer.timer;
+package com.TutorTimer.timer;
 
 import android.content.Context;
-import com.example.TutorTimer.R;
+import com.TutorTimer.R;
 
 public class TimerFactory
 {

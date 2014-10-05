@@ -1,10 +1,10 @@
-package com.example.TutorTimer.database;
+package com.TutorTimer.database;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import com.example.TutorTimer.R;
+import com.TutorTimer.R;
 
 public class Database
 {

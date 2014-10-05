@@ -1,4 +1,4 @@
-package com.example.TutorTimer.Logger;
+package com.TutorTimer.Logger;
 
 import android.os.Environment;
 import android.util.Log;

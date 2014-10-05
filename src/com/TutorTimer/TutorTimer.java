@@ -1,14 +1,14 @@
-package com.example.TutorTimer;
+package com.TutorTimer;
 
 import android.app.Activity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
-import com.example.TutorTimer.Logger.Logger;
-import com.example.TutorTimer.students.StudentManager;
-import com.example.TutorTimer.timer.TimerFactory;
-import com.example.TutorTimer.ui.TutorActionBarFactory;
-import com.example.TutorTimer.utils.Utils;
+import com.TutorTimer.Logger.Logger;
+import com.TutorTimer.students.StudentManager;
+import com.TutorTimer.timer.TimerFactory;
+import com.TutorTimer.ui.TutorActionBarFactory;
+import com.TutorTimer.utils.Utils;
 
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;

@@ -1,4 +1,4 @@
-package com.example.TutorTimer.students;
+package com.TutorTimer.students;
 
 public class Student
 {

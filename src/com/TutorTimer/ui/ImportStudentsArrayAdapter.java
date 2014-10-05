@@ -1,4 +1,4 @@
-package com.example.TutorTimer.ui;
+package com.TutorTimer.ui;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -7,11 +7,11 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.TextView;
-import com.example.TutorTimer.Logger.Logger;
-import com.example.TutorTimer.R;
-import com.example.TutorTimer.students.Student;
-import com.example.TutorTimer.students.StudentManager;
-import com.example.TutorTimer.utils.Utils;
+import com.TutorTimer.Logger.Logger;
+import com.TutorTimer.R;
+import com.TutorTimer.students.Student;
+import com.TutorTimer.students.StudentManager;
+import com.TutorTimer.utils.Utils;
 
 import java.util.List;
 
