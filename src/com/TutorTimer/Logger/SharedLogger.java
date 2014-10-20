@@ -38,8 +38,18 @@ class SharedLogger
     {
         if (m_output != null)
         {
+            String className;
+            if (object instanceof Class)
+            {
+                className = ((Class) object).getSimpleName();
+            }
+            else
+            {
+                className = object.getClass().getSimpleName();
+            }
+
             String msg = String.format("%s [%s] %s: %s\n", new Date(), Thread.currentThread().getId(),
-                                       object.getClass().getSimpleName(), String.format(format, args));
+                                       className, String.format(format, args));
             try
             {
                 m_output.write(msg);

@@ -11,15 +11,10 @@ import com.TutorTimer.timer.TimerFactory;
 import com.TutorTimer.ui.CurrentStudentsArrayAdapter.CurrentStudentEntry;
 
 import java.util.LinkedList;
-import java.util.concurrent.ScheduledFuture;
-import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
 
 class CurrentStudentsTab extends TutorTab
 {
-    private static final long UI_UPDATE_RATE_MS = 500; // 0.5 seconds so the count down is smooth
-
     static ActionBar.Tab addCurrentStudentsTabToActionBar(ActionBar actionBar,
                                                           Activity activity,
                                                           ThreadPoolExecutor threadPool)
@@ -34,8 +29,6 @@ class CurrentStudentsTab extends TutorTab
     private final CurrentStudentsArrayAdapter     m_currentStudentsAdapter;
     private final LinkedList<CurrentStudentEntry> m_currentStudents;
     private final TimerFactory                    m_timerFactory;
-    private final ScheduledThreadPoolExecutor     m_scheduledThreadPoolExecutor;
-    private       ScheduledFuture<?>              m_uiUpdater;
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
@@ -43,14 +36,6 @@ class CurrentStudentsTab extends TutorTab
         m_activity.setContentView(R.layout.current_students_view);
         ListView currentStudentList = (ListView) m_activity.findViewById(R.id.current_student_list);
         currentStudentList.setAdapter(m_currentStudentsAdapter);
-        m_uiUpdater = m_scheduledThreadPoolExecutor.scheduleAtFixedRate(new LoadCurrentStudentsTask(), UI_UPDATE_RATE_MS, UI_UPDATE_RATE_MS, TimeUnit.MILLISECONDS);
-    }
-
-    @Override
-    public void onTabUnselected(ActionBar.Tab tab, FragmentTransaction ft)
-    {
-        super.onTabUnselected(tab, ft);
-        m_uiUpdater.cancel(true);
     }
 
     private CurrentStudentsTab(Activity activity, ThreadPoolExecutor threadPool)
@@ -58,10 +43,6 @@ class CurrentStudentsTab extends TutorTab
         super(activity, threadPool);
 
         m_timerFactory = TimerFactory.getInstance(activity);
-
-        m_scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1);
-        m_scheduledThreadPoolExecutor.allowCoreThreadTimeOut(false);
-        m_scheduledThreadPoolExecutor.setMaximumPoolSize(1);
 
         m_currentStudents = new LinkedList<CurrentStudentEntry>();
         m_currentStudentsAdapter = new CurrentStudentsArrayAdapter(activity, R.layout.current_students_view, m_currentStudents);
