@@ -14,12 +14,14 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingRight="20px"
             android:layout_toLeftOf="@+id/reset_time"
             android:id="@+id/time_left_for_student"/>
 
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:paddingRight="20px"
             android:layout_toLeftOf="@+id/start_stop_buttons"
             android:id="@+id/reset_time"/>
 
