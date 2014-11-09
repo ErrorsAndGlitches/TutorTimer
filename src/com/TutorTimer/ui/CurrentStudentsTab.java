@@ -8,7 +8,6 @@ import com.TutorTimer.R;
 import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager;
 import com.TutorTimer.timer.TimerFactory;
-import com.TutorTimer.ui.CurrentStudentsArrayAdapter.CurrentStudentEntry;
 
 import java.util.LinkedList;
 import java.util.concurrent.ThreadPoolExecutor;

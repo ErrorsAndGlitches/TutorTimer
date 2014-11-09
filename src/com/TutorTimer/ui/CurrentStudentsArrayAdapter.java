@@ -2,6 +2,7 @@ package com.TutorTimer.ui;
 
 import android.app.Activity;
 import android.content.Context;
+import android.graphics.Color;
 import android.os.CountDownTimer;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,8 +14,6 @@ import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.R;
 import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager;
-import com.TutorTimer.ui.CurrentStudentsArrayAdapter.CurrentStudentEntry;
-import com.TutorTimer.timer.Timer;
 import com.TutorTimer.timer.TimerFactory;
 
 import java.util.List;
@@ -95,7 +94,9 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                         timeLeft = viewHolder.countDownTimer.getTimeRemaining();
                     }
 
-                    viewHolder.countDownTimer = new StudentCountDownTimer(timeLeft,
+                    viewHolder.countDownTimer = new StudentCountDownTimer(holder.entryView,
+                                                                          holder.defaultColor,
+                                                                          timeLeft,
                                                                           TimeUnit.SECONDS.toMillis(1L),
                                                                           m_activity,
                                                                           viewHolder.timeLeft);
@@ -165,6 +166,7 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                     }
 
                     setResetTime(holder.timeLeft, holder.student);
+                    holder.entryView.setBackgroundColor(holder.defaultColor);
                 }
             });
 
@@ -203,6 +205,7 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
         CurrentStudentEntry currentStudentEntry = getItem(position);
         Student student = currentStudentEntry.student;
         viewHolder.student = student;
+        viewHolder.entryView = rowView;
 
         // set the student name
         TextView studentNameTextView = viewHolder.studentName;
@@ -222,6 +225,19 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
         viewHolder.resetTimerButton.setTag(viewHolder);
         viewHolder.removeFromCurrentStudentsButton.setTag(viewHolder);
 
+        if (position % 2 == 0)
+        {
+            int defaultColor = Color.DKGRAY;
+            viewHolder.defaultColor = defaultColor;
+            rowView.setBackgroundColor(defaultColor);
+        }
+        else
+        {
+            int defaultColor = Color.BLACK;
+            viewHolder.defaultColor = defaultColor;
+            rowView.setBackgroundColor(defaultColor);
+        }
+
         return rowView;
     }
 
@@ -237,40 +253,12 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
         textView.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
-    public static class CurrentStudentEntry
-    {
-        public final Student student;
-        public final Timer   timer;
-
-        public CurrentStudentEntry(Student student, Timer timer)
-        {
-            this.student = student;
-            this.timer = timer;
-        }
-
-        @Override
-        public boolean equals(Object o)
-        {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            CurrentStudentEntry that = (CurrentStudentEntry) o;
-
-            if (student != null ? !student.equals(that.student) : that.student != null) return false;
-
-            return true;
-        }
-
-        @Override
-        public int hashCode()
-        {
-            return student != null ? student.hashCode() : 0;
-        }
-    }
-
     private static final class ViewHolder
     {
         Student student;
+
+        // the top-most view for the entry
+        View entryView;
 
         // objects shown on the UI
         TextView studentName;
@@ -287,20 +275,34 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
 
         // count down timer
         StudentCountDownTimer countDownTimer;
+
+        // default color
+        int defaultColor;
     }
 
     private static final class StudentCountDownTimer extends CountDownTimer
     {
+        private static final int RUNNING_OUT_OF_TIME_COLOR = Color.RED;
+
         private final Activity m_activity;
         private final TextView m_timeLeft;
+        private final View     m_entryView;
+        private final int      m_defaultColor;
 
         // this is the time to be saved if the clock is stopped - not reset
-        private long m_timeLeftMs;
+        private long    m_timeLeftMs;
         private boolean m_isStopped;
 
-        public StudentCountDownTimer(long millisInFuture, long countDownInterval, Activity activity, TextView timeLeft)
+        public StudentCountDownTimer(View entryView,
+                                     int defaultColor,
+                                     long millisInFuture,
+                                     long countDownInterval,
+                                     Activity activity,
+                                     TextView timeLeft)
         {
             super(millisInFuture, countDownInterval);
+            m_entryView = entryView;
+            m_defaultColor = defaultColor;
             m_activity = activity;
             m_timeLeft = timeLeft;
             m_isStopped = false;
@@ -319,6 +321,8 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
         {
             Logger.log(this, "Count down timer has finished");
             updateTimeLeft(0L);
+            m_entryView.setBackgroundColor(RUNNING_OUT_OF_TIME_COLOR);
+            updateTextView();
         }
 
         long getTimeRemaining()
@@ -341,6 +345,26 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
         private void updateTimeLeft(long millis)
         {
             setTextViewTimeSec(m_timeLeft, TimeUnit.MILLISECONDS.toSeconds(millis));
+
+            // update the color if it's running out of time
+            long timeLeftSec = TimeUnit.MILLISECONDS.toSeconds(m_timeLeftMs);
+            if (timeLeftSec <= 30)
+            {
+                if (timeLeftSec % 2 == 0)
+                {
+                    m_entryView.setBackgroundColor(m_defaultColor);
+                }
+                else
+                {
+                    m_entryView.setBackgroundColor(RUNNING_OUT_OF_TIME_COLOR);
+                }
+            }
+
+            updateTextView();
+        }
+
+        private void updateTextView()
+        {
             m_activity.runOnUiThread(new Runnable()
             {
                 @Override
