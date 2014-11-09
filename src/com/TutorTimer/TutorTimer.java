@@ -119,11 +119,11 @@ public class TutorTimer extends Activity
         {
             try
             {
-                int newResetDuration = Integer.parseInt(newResetDurationStr);
+                long newResetDuration = Long.parseLong(newResetDurationStr);
 
                 if (newResetDuration >= 0)
                 {
-                    TimerFactory.getInstance(this).setResetDurationSec(newResetDuration);
+                    TimerFactory.getInstance(this).setResetDuration(TimeUnit.SECONDS.toMillis(newResetDuration));
                     Utils.shortToast(this, "Set reset duration to %d seconds", newResetDuration);
                 }
                 else

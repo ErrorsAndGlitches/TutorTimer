@@ -6,6 +6,7 @@ import android.database.Cursor;
 import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.database.Database;
 import com.TutorTimer.database.DbUtils;
+import com.TutorTimer.timer.TimerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -14,6 +15,7 @@ public class StudentManager
 {
     private static StudentManager s_studentManager;
 
+    private final TimerFactory                 m_timerFactory;
     private final Database                     m_database;
     private final List<StudentManagerObserver> m_observers;
     private final List<Student>                m_currentStudents;
@@ -114,7 +116,7 @@ public class StudentManager
             @Override
             public void process(Cursor cursor)
             {
-                students.add(new Student(cursor.getLong(0), cursor.getString(1)));
+                students.add(new Student(cursor.getLong(0), cursor.getString(1), m_timerFactory.getResetDuration()));
             }
         });
 
@@ -183,6 +185,7 @@ public class StudentManager
 
     private StudentManager(Context context)
     {
+        m_timerFactory = TimerFactory.getInstance(context);
         m_database = new Database(context);
         m_observers = new LinkedList<StudentManagerObserver>();
         m_currentStudents = new LinkedList<Student>();

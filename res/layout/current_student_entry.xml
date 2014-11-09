@@ -14,23 +14,79 @@
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/reset_timer_button"
+            android:paddingRight="20px"
+            android:layout_toLeftOf="@+id/reset_time"
             android:id="@+id/time_left_for_student"/>
 
-    <Button
+    <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_toLeftOf="@+id/remove_current_student"
-            android:text="Reset Timer"
-            android:id="@+id/reset_timer_button"
-            android:onClick="resetTimer"/>
+            android:paddingRight="20px"
+            android:layout_toLeftOf="@+id/start_stop_buttons"
+            android:id="@+id/reset_time"/>
 
-    <Button
-            android:layout_width="wrap_content"
+    <LinearLayout
             android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_toLeftOf="@+id/reset_time_change_buttons"
+            android:id="@+id/start_stop_buttons">
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start"
+                android:id="@+id/start_timer_button"/>
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Stop"
+                android:id="@+id/stop_timer_button"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
+            android:layout_toLeftOf="@+id/reset_remove_buttons"
+            android:id="@+id/reset_time_change_buttons">
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Inc"
+                android:id="@+id/increase_time_button"/>
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Dec"
+                android:id="@+id/decrease_time_button"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:orientation="vertical"
             android:layout_alignParentRight="true"
-            android:text="Remove Student"
-            android:id="@+id/remove_current_student"
-            android:onClick="resetTimer"/>
+            android:id="@+id/reset_remove_buttons">
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="Reset Timer"
+                android:id="@+id/reset_timer_button"/>
+
+        <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Remove Student"
+                android:id="@+id/remove_current_student"/>
+
+    </LinearLayout>
 
 </RelativeLayout>

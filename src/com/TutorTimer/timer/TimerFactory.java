@@ -1,13 +1,16 @@
 package com.TutorTimer.timer;
 
 import android.content.Context;
+import android.content.res.Resources;
 import com.TutorTimer.R;
 
 public class TimerFactory
 {
     private static TimerFactory s_timerFactory;
 
-    private int m_resetDurationSec;
+    private final long m_incTimeAmount;
+    private final long m_decTimeAmount;
+    private       long m_resetDuration;
 
     public static TimerFactory getInstance(Context context)
     {
@@ -25,23 +28,36 @@ public class TimerFactory
         return s_timerFactory;
     }
 
-    public int getResetDurationSec()
+    public long getResetDuration()
     {
-        return m_resetDurationSec;
+        return m_resetDuration;
     }
 
-    public void setResetDurationSec(int resetDurationSec)
+    public void setResetDuration(long resetDuration)
     {
-        m_resetDurationSec = resetDurationSec;
+        m_resetDuration = resetDuration;
+    }
+
+    public long getIncTimeAmount()
+    {
+        return m_incTimeAmount;
+    }
+
+    public long getDecTimeAmount()
+    {
+        return m_decTimeAmount;
     }
 
     public Timer newTimer()
     {
-        return new Timer(m_resetDurationSec);
+        return new Timer(m_resetDuration);
     }
 
     private TimerFactory(Context context)
     {
-        m_resetDurationSec = context.getResources().getInteger(R.integer.default_timer_duration_sec);
+        Resources resources = context.getResources();
+        m_incTimeAmount = resources.getInteger(R.integer.inc_time_amt);
+        m_decTimeAmount = resources.getInteger(R.integer.dec_time_amt);
+        m_resetDuration = resources.getInteger(R.integer.default_timer_duration);
     }
 }
