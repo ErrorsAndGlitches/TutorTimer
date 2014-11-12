@@ -14,34 +14,35 @@ import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.R;
 import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager;
-import com.TutorTimer.utils.TimerFactory;
 import com.TutorTimer.utils.CurrentStudentEntry;
+import com.TutorTimer.utils.CurrentStudentRoster;
+import com.TutorTimer.utils.TimerFactory;
 
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntry>
 {
-    private final Activity       m_activity;
-    private final StudentManager m_studentManager;
-    private final TimerFactory   m_timerFactory;
+    private final Activity             m_activity;
+    private final StudentManager       m_studentManager;
+    private final TimerFactory         m_timerFactory;
+    private final CurrentStudentRoster m_studentRoster;
 
-    public CurrentStudentsArrayAdapter(Activity activity, int resource, List<CurrentStudentEntry> objects)
+    public CurrentStudentsArrayAdapter(Activity activity, int resource, CurrentStudentRoster studentRoster)
     {
-        super(activity, resource, objects);
+        super(activity, resource, studentRoster.getRoster());
         m_activity = activity;
         m_studentManager = StudentManager.getInstance(activity);
         m_timerFactory = TimerFactory.getInstance(activity);
+        m_studentRoster = studentRoster;
     }
 
     @Override
     public View getView(int position, View convertView, ViewGroup parent)
     {
-        LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
         final View rowView;
         if (convertView == null)
         {
+            LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
             rowView = inflater.inflate(R.layout.current_student_entry, parent, false);
 
             // create a view holder with all the links
@@ -88,6 +89,9 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                     }
 
                     setStartPauseButtonText(viewHolder.startPauseButton, viewHolder.studentEntry);
+
+                    m_studentRoster.notifyStudentStateChange();
+                    notifyDataSetChanged();
                 }
             });
 
@@ -143,6 +147,9 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                     setTextViewToTime(holder.timeLeftTextView, holder.studentEntry.getResetTime());
                     setStartPauseButtonText(holder.startPauseButton, holder.studentEntry);
                     holder.entryView.setBackgroundColor(holder.defaultColor);
+
+                    m_studentRoster.notifyStudentStateChange();
+                    notifyDataSetChanged();
                 }
             });
 
@@ -162,6 +169,8 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                         holder.countDownTimer.cancel();
                         holder.countDownTimer = null;
                     }
+
+                    notifyDataSetChanged();
                 }
             });
 
@@ -192,7 +201,7 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
         setStartPauseButtonText(viewHolder.startPauseButton, studentEntry);
 
         // set the time left to the reset time
-        setTextViewToTime(viewHolder.timeLeftTextView, studentEntry.getResetTime());
+        setTextViewToTime(viewHolder.timeLeftTextView, studentEntry.getTimeLeft());
 
         // set the reset time
         setTextViewToTime(viewHolder.resetTimeTextView, studentEntry.getResetTime());
@@ -215,6 +224,23 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
             int defaultColor = Color.BLACK;
             viewHolder.defaultColor = defaultColor;
             rowView.setBackgroundColor(defaultColor);
+        }
+
+        // update the count down timer information if running
+        if (viewHolder.countDownTimer != null)
+        {
+            viewHolder.countDownTimer.cancel();
+            viewHolder.countDownTimer = null;
+        }
+
+        if (!studentEntry.isTimerStopped())
+        {
+            viewHolder.countDownTimer = new StudentCountDownTimer(m_activity,
+                                                                  rowView,
+                                                                  viewHolder.timeLeftTextView,
+                                                                  studentEntry,
+                                                                  viewHolder.defaultColor);
+            viewHolder.countDownTimer.start();
         }
 
         return rowView;

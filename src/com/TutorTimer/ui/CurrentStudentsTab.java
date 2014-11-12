@@ -7,10 +7,10 @@ import android.widget.ListView;
 import com.TutorTimer.R;
 import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager;
-import com.TutorTimer.utils.TimerFactory;
 import com.TutorTimer.utils.CurrentStudentEntry;
+import com.TutorTimer.utils.CurrentStudentRoster;
+import com.TutorTimer.utils.TimerFactory;
 
-import java.util.LinkedList;
 import java.util.concurrent.ThreadPoolExecutor;
 
 class CurrentStudentsTab extends TutorTab
@@ -26,9 +26,9 @@ class CurrentStudentsTab extends TutorTab
         return tab;
     }
 
-    private final CurrentStudentsArrayAdapter     m_currentStudentsAdapter;
-    private final LinkedList<CurrentStudentEntry> m_currentStudents;
-    private final TimerFactory                    m_timerFactory;
+    private final CurrentStudentsArrayAdapter m_currentStudentsAdapter;
+    private final CurrentStudentRoster        m_studentRoster;
+    private final TimerFactory                m_timerFactory;
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
@@ -43,11 +43,10 @@ class CurrentStudentsTab extends TutorTab
         super(activity, threadPool);
 
         m_timerFactory = TimerFactory.getInstance(activity);
-
-        m_currentStudents = new LinkedList<CurrentStudentEntry>();
+        m_studentRoster = new CurrentStudentRoster();
         m_currentStudentsAdapter = new CurrentStudentsArrayAdapter(activity,
                                                                    R.layout.current_students_view,
-                                                                   m_currentStudents);
+                                                                   m_studentRoster);
 
         ListView currentStudentList = (ListView) activity.findViewById(R.id.current_student_list);
         currentStudentList.setAdapter(m_currentStudentsAdapter);
@@ -57,14 +56,14 @@ class CurrentStudentsTab extends TutorTab
             @Override
             public void onStudentAdded(Student student)
             {
-                m_currentStudents.add(new CurrentStudentEntry(student, m_timerFactory.getResetDuration()));
+                m_studentRoster.addStudent(new CurrentStudentEntry(student, m_timerFactory.getResetDuration()));
                 m_threadPool.submit(new LoadCurrentStudentsTask());
             }
 
             @Override
             public void onStudentRemoved(Student student)
             {
-                m_currentStudents.remove(new CurrentStudentEntry(student, 0L));
+                m_studentRoster.removeStudent(new CurrentStudentEntry(student, 0L));
                 m_threadPool.submit(new LoadCurrentStudentsTask());
             }
         });

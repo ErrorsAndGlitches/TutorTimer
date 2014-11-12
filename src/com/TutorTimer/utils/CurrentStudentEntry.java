@@ -33,7 +33,7 @@ public class CurrentStudentEntry
     public void addToResetTime(long delta)
     {
         long newResetTime = m_resetTime + delta;
-        if (newResetTime >= 0)
+        if (newResetTime > 0)
         {
             m_resetTime = newResetTime;
         }
