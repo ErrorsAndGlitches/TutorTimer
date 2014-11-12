@@ -14,7 +14,8 @@ import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.R;
 import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager;
-import com.TutorTimer.timer.TimerFactory;
+import com.TutorTimer.utils.TimerFactory;
+import com.TutorTimer.utils.CurrentStudentEntry;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -45,13 +46,12 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
 
             // create a view holder with all the links
             final ViewHolder viewHolder = new ViewHolder();
-            viewHolder.studentName = (TextView) rowView.findViewById(R.id.timer_student_name);
-            viewHolder.timeLeft = (TextView) rowView.findViewById(R.id.time_left_for_student);
-            viewHolder.resetTime = (TextView) rowView.findViewById(R.id.reset_time);
+            viewHolder.studentNameTextView = (TextView) rowView.findViewById(R.id.timer_student_name);
+            viewHolder.timeLeftTextView = (TextView) rowView.findViewById(R.id.time_left_for_student);
+            viewHolder.resetTimeTextView = (TextView) rowView.findViewById(R.id.reset_time);
 
             // start, stop buttons
-            viewHolder.startButton = (Button) rowView.findViewById(R.id.start_timer_button);
-            viewHolder.stopButton = (Button) rowView.findViewById(R.id.stop_timer_button);
+            viewHolder.startPauseButton = (Button) rowView.findViewById(R.id.start_pause_timer_button);
 
             // increase and decrease reset time buttons
             viewHolder.incTimeButton = (Button) rowView.findViewById(R.id.increase_time_button);
@@ -62,62 +62,32 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
             viewHolder.removeFromCurrentStudentsButton = (Button) rowView.findViewById(R.id.remove_current_student);
 
             // create the click listeners
-            viewHolder.startButton.setOnClickListener(new View.OnClickListener()
+            viewHolder.startPauseButton.setOnClickListener(new View.OnClickListener()
             {
                 @Override
                 public void onClick(View v)
                 {
                     ViewHolder holder = (ViewHolder) v.getTag();
 
-                    // check if the timer is actually already running
-                    if (viewHolder.countDownTimer != null && !viewHolder.countDownTimer.isStopped())
+                    // if the timer is stopped, start the timer
+                    if (viewHolder.studentEntry.isTimerStopped())
                     {
-                        Logger.log(CurrentStudentsArrayAdapter.class,
-                                   "Not starting timer for student %s because timer is already running",
-                                   holder.student);
-                        return;
-                    }
-
-                    long timeLeft;
-                    if (viewHolder.countDownTimer == null)
-                    {
-                        Logger.log(CurrentStudentsArrayAdapter.class,
-                                   "Starting the timer for student %s",
-                                   holder.student);
-                        timeLeft = holder.student.getResetTime();
+                        viewHolder.countDownTimer = new StudentCountDownTimer(m_activity,
+                                                                              holder.entryView,
+                                                                              viewHolder.timeLeftTextView,
+                                                                              viewHolder.studentEntry,
+                                                                              holder.defaultColor);
+                        viewHolder.studentEntry.setTimerStarted();
+                        viewHolder.countDownTimer.start();
                     }
                     else
                     {
-                        Logger.log(CurrentStudentsArrayAdapter.class,
-                                   "Resuming the countdown for student %s",
-                                   holder.student);
-                        timeLeft = viewHolder.countDownTimer.getTimeRemaining();
+                        viewHolder.studentEntry.setTimerStopped();
+                        viewHolder.countDownTimer.cancel();
+                        viewHolder.countDownTimer = null;
                     }
 
-                    viewHolder.countDownTimer = new StudentCountDownTimer(holder.entryView,
-                                                                          holder.defaultColor,
-                                                                          timeLeft,
-                                                                          TimeUnit.SECONDS.toMillis(1L),
-                                                                          m_activity,
-                                                                          viewHolder.timeLeft);
-
-                    viewHolder.countDownTimer.start();
-                }
-            });
-
-            viewHolder.stopButton.setOnClickListener(new View.OnClickListener()
-            {
-                @Override
-                public void onClick(View v)
-                {
-                    ViewHolder holder = (ViewHolder) v.getTag();
-                    if (viewHolder.countDownTimer != null)
-                    {
-                        Logger.log(CurrentStudentsArrayAdapter.class,
-                                   "Stopping the timer for student %s",
-                                   holder.student);
-                        viewHolder.countDownTimer.stop();
-                    }
+                    setStartPauseButtonText(viewHolder.startPauseButton, viewHolder.studentEntry);
                 }
             });
 
@@ -129,9 +99,9 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                     final ViewHolder holder = (ViewHolder) v.getTag();
                     Logger.log(CurrentStudentsArrayAdapter.class,
                                "Increasing the reset time for student %s",
-                               holder.student);
-                    holder.student.addToResetTime(m_timerFactory.getIncTimeAmount());
-                    setResetTime(viewHolder.resetTime, viewHolder.student);
+                               holder.studentEntry.getStudent());
+                    holder.studentEntry.addToResetTime(m_timerFactory.getIncTimeAmount());
+                    setTextViewToTime(viewHolder.resetTimeTextView, holder.studentEntry.getResetTime());
                 }
             });
 
@@ -143,9 +113,9 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                     final ViewHolder holder = (ViewHolder) v.getTag();
                     Logger.log(CurrentStudentsArrayAdapter.class,
                                "Decreasing the reset time for student %s",
-                               holder.student);
-                    holder.student.addToResetTime(m_timerFactory.getDecTimeAmount());
-                    setResetTime(viewHolder.resetTime, viewHolder.student);
+                               holder.studentEntry.getStudent());
+                    holder.studentEntry.addToResetTime(m_timerFactory.getDecTimeAmount());
+                    setTextViewToTime(viewHolder.resetTimeTextView, holder.studentEntry.getResetTime());
                 }
             });
 
@@ -157,7 +127,9 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                     final ViewHolder holder = (ViewHolder) v.getTag();
 
                     // stop the timer, set the base, start the timer
-                    Logger.log(CurrentStudentsArrayAdapter.class, "Resetting the timer for student %s", holder.student);
+                    Logger.log(CurrentStudentsArrayAdapter.class,
+                               "Resetting the timer for student %s",
+                               holder.studentEntry.getStudent());
 
                     if (holder.countDownTimer != null)
                     {
@@ -165,7 +137,11 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                         holder.countDownTimer = null;
                     }
 
-                    setResetTime(holder.timeLeft, holder.student);
+                    holder.studentEntry.setTimerStopped();
+                    holder.studentEntry.setTimeLeft(holder.studentEntry.getResetTime());
+
+                    setTextViewToTime(holder.timeLeftTextView, holder.studentEntry.getResetTime());
+                    setStartPauseButtonText(holder.startPauseButton, holder.studentEntry);
                     holder.entryView.setBackgroundColor(holder.defaultColor);
                 }
             });
@@ -178,8 +154,8 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                     ViewHolder holder = (ViewHolder) v.getTag();
                     Logger.log(CurrentStudentsArrayAdapter.class,
                                "Removing %s from current student list",
-                               holder.student);
-                    m_studentManager.removeFromCurrentStudents(holder.student);
+                               holder.studentEntry.getStudent());
+                    m_studentManager.removeFromCurrentStudents(holder.studentEntry.getStudent());
 
                     if (holder.countDownTimer != null)
                     {
@@ -202,24 +178,27 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
         ViewHolder viewHolder = (ViewHolder) rowView.getTag();
 
         // set the student & count down timer
-        CurrentStudentEntry currentStudentEntry = getItem(position);
-        Student student = currentStudentEntry.student;
-        viewHolder.student = student;
+        CurrentStudentEntry studentEntry = getItem(position);
+        viewHolder.studentEntry = studentEntry;
+
+        Student student = studentEntry.getStudent();
         viewHolder.entryView = rowView;
 
         // set the student name
-        TextView studentNameTextView = viewHolder.studentName;
+        TextView studentNameTextView = viewHolder.studentNameTextView;
         studentNameTextView.setText(student.toString());
 
+        // set the start/pause button to the write text
+        setStartPauseButtonText(viewHolder.startPauseButton, studentEntry);
+
         // set the time left to the reset time
-        setResetTime(viewHolder.timeLeft, student);
+        setTextViewToTime(viewHolder.timeLeftTextView, studentEntry.getResetTime());
 
         // set the reset time
-        setResetTime(viewHolder.resetTime, student);
+        setTextViewToTime(viewHolder.resetTimeTextView, studentEntry.getResetTime());
 
         // add the student to the button's tag since the info will be needed in the onClick()
-        viewHolder.startButton.setTag(viewHolder);
-        viewHolder.stopButton.setTag(viewHolder);
+        viewHolder.startPauseButton.setTag(viewHolder);
         viewHolder.incTimeButton.setTag(viewHolder);
         viewHolder.decTimeButton.setTag(viewHolder);
         viewHolder.resetTimerButton.setTag(viewHolder);
@@ -241,13 +220,21 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
         return rowView;
     }
 
-    private static void setResetTime(TextView textView, Student student)
+    private static void setStartPauseButtonText(Button startPauseButton, CurrentStudentEntry studentEntry)
     {
-        setTextViewTimeSec(textView, TimeUnit.MILLISECONDS.toSeconds(student.getResetTime()));
+        if (studentEntry.isTimerStopped())
+        {
+            startPauseButton.setText("Start");
+        }
+        else
+        {
+            startPauseButton.setText("Pause");
+        }
     }
 
-    private static void setTextViewTimeSec(TextView textView, long resetTimeSec)
+    private static void setTextViewToTime(TextView textView, long resetTime)
     {
+        long resetTimeSec = TimeUnit.MILLISECONDS.toSeconds(resetTime);
         long minutes = TimeUnit.SECONDS.toMinutes(resetTimeSec);
         long seconds = resetTimeSec - TimeUnit.MINUTES.toSeconds(minutes);
         textView.setText(String.format("%02d:%02d", minutes, seconds));
@@ -255,19 +242,18 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
 
     private static final class ViewHolder
     {
-        Student student;
+        CurrentStudentEntry studentEntry;
 
         // the top-most view for the entry
         View entryView;
 
         // objects shown on the UI
-        TextView studentName;
-        TextView timeLeft;
-        TextView resetTime;
+        TextView studentNameTextView;
+        TextView timeLeftTextView;
+        TextView resetTimeTextView;
 
         // buttons
-        Button startButton;
-        Button stopButton;
+        Button startPauseButton;
         Button incTimeButton;
         Button decTimeButton;
         Button resetTimerButton;
@@ -284,35 +270,33 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
     {
         private static final int RUNNING_OUT_OF_TIME_COLOR = Color.RED;
 
-        private final Activity m_activity;
-        private final TextView m_timeLeft;
-        private final View     m_entryView;
-        private final int      m_defaultColor;
+        private final Activity            m_activity;
+        private final View                m_entryView;
+        private final TextView            m_timeLeftTextView;
+        private final CurrentStudentEntry m_studentEntry;
+        private final int                 m_defaultColor;
 
         // this is the time to be saved if the clock is stopped - not reset
-        private long    m_timeLeftMs;
-        private boolean m_isStopped;
 
-        public StudentCountDownTimer(View entryView,
-                                     int defaultColor,
-                                     long millisInFuture,
-                                     long countDownInterval,
-                                     Activity activity,
-                                     TextView timeLeft)
+        public StudentCountDownTimer(Activity activity,
+                                     View entryView,
+                                     TextView timeLeftTextView,
+                                     CurrentStudentEntry studentEntry,
+                                     int defaultColor)
         {
-            super(millisInFuture, countDownInterval);
-            m_entryView = entryView;
-            m_defaultColor = defaultColor;
+            super(studentEntry.getTimeLeft(), TimeUnit.SECONDS.toMillis(1L));
             m_activity = activity;
-            m_timeLeft = timeLeft;
-            m_isStopped = false;
+            m_entryView = entryView;
+            m_timeLeftTextView = timeLeftTextView;
+            m_studentEntry = studentEntry;
+            m_defaultColor = defaultColor;
         }
 
         @Override
         public void onTick(long millisUntilFinished)
         {
             Logger.log(this, "Updating the tick time: %d", millisUntilFinished);
-            m_timeLeftMs = millisUntilFinished;
+            m_studentEntry.setTimeLeft(millisUntilFinished);
             updateTimeLeft(millisUntilFinished);
         }
 
@@ -320,34 +304,18 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
         public void onFinish()
         {
             Logger.log(this, "Count down timer has finished");
+            m_studentEntry.setTimeLeft(0L);
             updateTimeLeft(0L);
             m_entryView.setBackgroundColor(RUNNING_OUT_OF_TIME_COLOR);
             updateTextView();
         }
 
-        long getTimeRemaining()
-        {
-            return m_timeLeftMs;
-        }
-
-        boolean isStopped()
-        {
-            return m_isStopped;
-        }
-
-        // don't call cancel
-        public void stop()
-        {
-            m_isStopped = true;
-            cancel();
-        }
-
         private void updateTimeLeft(long millis)
         {
-            setTextViewTimeSec(m_timeLeft, TimeUnit.MILLISECONDS.toSeconds(millis));
+            setTextViewToTime(m_timeLeftTextView, millis);
 
             // update the color if it's running out of time
-            long timeLeftSec = TimeUnit.MILLISECONDS.toSeconds(m_timeLeftMs);
+            long timeLeftSec = TimeUnit.MILLISECONDS.toSeconds(millis);
             if (timeLeftSec <= 30)
             {
                 if (timeLeftSec % 2 == 0)
@@ -370,7 +338,7 @@ public class CurrentStudentsArrayAdapter extends ArrayAdapter<CurrentStudentEntr
                 @Override
                 public void run()
                 {
-                    m_timeLeft.invalidate();
+                    m_timeLeftTextView.invalidate();
                 }
             });
         }

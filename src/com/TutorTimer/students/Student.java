@@ -4,13 +4,11 @@ public class Student
 {
     private final String m_name;
     private final long   m_id;
-    private       long   m_resetTime;
 
-    Student(long id, String name, long resetTime)
+    Student(long id, String name)
     {
         m_id = id;
         m_name = name;
-        m_resetTime = resetTime;
     }
 
     public long getId()
@@ -21,20 +19,6 @@ public class Student
     public String getName()
     {
         return m_name;
-    }
-
-    public long getResetTime()
-    {
-        return m_resetTime;
-    }
-
-    public void addToResetTime(long addAmt)
-    {
-        long newResetTime = m_resetTime + addAmt;
-        if (newResetTime > 0)
-        {
-            m_resetTime = newResetTime;
-        }
     }
 
     @Override

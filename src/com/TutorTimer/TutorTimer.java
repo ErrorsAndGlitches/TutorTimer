@@ -6,7 +6,7 @@ import android.view.View;
 import android.widget.EditText;
 import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.students.StudentManager;
-import com.TutorTimer.timer.TimerFactory;
+import com.TutorTimer.utils.TimerFactory;
 import com.TutorTimer.ui.TutorActionBarFactory;
 import com.TutorTimer.utils.Utils;
 

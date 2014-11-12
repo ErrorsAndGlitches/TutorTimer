@@ -1,4 +1,4 @@
-package com.TutorTimer.timer;
+package com.TutorTimer.utils;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -46,11 +46,6 @@ public class TimerFactory
     public long getDecTimeAmount()
     {
         return m_decTimeAmount;
-    }
-
-    public Timer newTimer()
-    {
-        return new Timer(m_resetDuration);
     }
 
     private TimerFactory(Context context)
