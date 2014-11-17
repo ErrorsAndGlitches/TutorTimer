@@ -14,13 +14,13 @@ import com.TutorTimer.R;
 import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager;
 import com.TutorTimer.utils.TimerFactory;
+import com.TutorTimer.utils.Utils;
 
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 {
-    static abstract class ViewHolder
+    static class ViewHolder
     {
         Student student;
 
@@ -67,7 +67,7 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
             rowView = inflater.inflate(R.layout.current_student_entry, parent, false);
 
             // create a view holder with all the links
-            ViewHolder viewHolder = createViewHolder();
+            ViewHolder viewHolder = new ViewHolder();
             viewHolder.entryView = rowView;
 
             viewHolder.studentNameTextView = (TextView) rowView.findViewById(R.id.timer_student_name);
@@ -122,16 +122,14 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         viewHolder.studentNameTextView.setText(student.toString());
 
         // set the time left and reset time
-        setTextViewToTime(viewHolder.timeLeftTextView, student.getTimeLeft());
-        setTextViewToTime(viewHolder.resetTimeTextView, student.getResetTime());
+        Utils.setTextViewToTime(viewHolder.timeLeftTextView, student.getTimeLeft());
+        Utils.setTextViewToTime(viewHolder.resetTimeTextView, student.getResetTime());
 
         // set the color of the parent view and save in view holder
         setViewColor(position, rowView, viewHolder);
 
         return rowView;
     }
-
-    abstract ViewHolder createViewHolder();
 
     abstract View.OnClickListener getStartPauseClickListener();
 
@@ -143,20 +141,12 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 
     static void resetTimeLeftTextView(ViewHolder viewHolder)
     {
-        setTextViewToTime(viewHolder.timeLeftTextView, viewHolder.student.getTimeLeft());
+        Utils.setTextViewToTime(viewHolder.timeLeftTextView, viewHolder.student.getTimeLeft());
     }
 
     static void resetBackgroundColor(ViewHolder viewHolder)
     {
         viewHolder.entryView.setBackgroundColor(viewHolder.defaultColor);
-    }
-
-    static void setTextViewToTime(TextView textView, long time)
-    {
-        long resetTimeSec = TimeUnit.MILLISECONDS.toSeconds(time);
-        long minutes = TimeUnit.SECONDS.toMinutes(resetTimeSec);
-        long seconds = resetTimeSec - TimeUnit.MINUTES.toSeconds(minutes);
-        textView.setText(String.format("%02d:%02d", minutes, seconds));
     }
 
     private void setViewColor(int position, View rowView, ViewHolder viewHolder)
@@ -187,7 +177,7 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
                            "Increasing the reset time for student %s",
                            holder.student);
                 holder.student.addToResetTime(m_timerFactory.getIncTimeAmount());
-                setTextViewToTime(holder.resetTimeTextView, holder.student.getResetTime());
+                Utils.setTextViewToTime(holder.resetTimeTextView, holder.student.getResetTime());
             }
         };
     }
@@ -204,7 +194,7 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
                            "Decreasing the reset time for student %s",
                            holder.student);
                 holder.student.addToResetTime(m_timerFactory.getDecTimeAmount());
-                setTextViewToTime(holder.resetTimeTextView, holder.student.getResetTime());
+                Utils.setTextViewToTime(holder.resetTimeTextView, holder.student.getResetTime());
             }
         };
     }

@@ -89,10 +89,6 @@ public class StudentManager
 
         // put the student in its new location
         addStudentToListType(toType, student);
-
-        // send out the notifications
-        notifyStudentListObserversForType(fromType);
-        notifyStudentListObserversForType(toType);
     }
 
     public boolean removeStudent(StudentListType type, Student student)
@@ -151,7 +147,6 @@ public class StudentManager
         if (id != -1)
         {
             addStudentToListType(StudentListType.IMPORT, new Student(id, name, m_timerFactory.getResetDuration()));
-            notifyStudentListObserversForType(StudentListType.IMPORT);
         }
     }
 
@@ -195,15 +190,23 @@ public class StudentManager
         notifyStudentListObserversForType(StudentListType.IMPORT);
     }
 
+    public void resortActiveStudentList()
+    {
+        Collections.sort(m_studentLists.get(StudentListType.ACTIVE), s_studentListComparators.get(StudentListType.ACTIVE));
+        notifyStudentListObserversForType(StudentListType.ACTIVE);
+    }
+
     private void addStudentToListType(StudentListType type, Student student)
     {
         List<Student> studentList = m_studentLists.get(type);
         studentList.add(student);
         Collections.sort(studentList, s_studentListComparators.get(type));
+        notifyStudentListObserversForType(type);
     }
 
     private void notifyStudentListObserversForType(StudentListType type)
     {
+        Logger.log(this, "Notifying list changed for type: %s", type);
         for (StudentListObserver observer : m_studentObserversList.get(type))
         {
             observer.onListChanged();

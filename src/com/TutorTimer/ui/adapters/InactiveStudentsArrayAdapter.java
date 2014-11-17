@@ -2,6 +2,7 @@ package com.TutorTimer.ui.adapters;
 
 import android.app.Activity;
 import android.view.View;
+import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager.StudentListType;
 
@@ -22,12 +23,6 @@ public class InactiveStudentsArrayAdapter extends StudentsArrayAdapter
     }
 
     @Override
-    ViewHolder createViewHolder()
-    {
-        return new InactiveViewHolder();
-    }
-
-    @Override
     String getStartPauseButtonText()
     {
         return START_STRING;
@@ -41,7 +36,8 @@ public class InactiveStudentsArrayAdapter extends StudentsArrayAdapter
             @Override
             public void onClick(View v)
             {
-                InactiveViewHolder viewHolder = (InactiveViewHolder) v.getTag();
+                ViewHolder viewHolder = (ViewHolder) v.getTag();
+                Logger.log(View.OnClickListener.class, "Resetting the timer for student %s", viewHolder.student);
                 viewHolder.student.setTimeLeft(viewHolder.student.getResetTime());
                 resetBackgroundColor(viewHolder);
                 resetTimeLeftTextView(viewHolder);
@@ -57,7 +53,8 @@ public class InactiveStudentsArrayAdapter extends StudentsArrayAdapter
             @Override
             public void onClick(View v)
             {
-                InactiveViewHolder viewHolder = (InactiveViewHolder) v.getTag();
+                ViewHolder viewHolder = (ViewHolder) v.getTag();
+                Logger.log(View.OnClickListener.class, "Starting the timer for student %s", viewHolder.student);
                 m_studentManager.moveStudent(StudentListType.INACTIVE, StudentListType.ACTIVE, viewHolder.student);
             }
         };
@@ -71,13 +68,10 @@ public class InactiveStudentsArrayAdapter extends StudentsArrayAdapter
             @Override
             public void onClick(View v)
             {
-                InactiveViewHolder viewHolder = (InactiveViewHolder) v.getTag();
+                ViewHolder viewHolder = (ViewHolder) v.getTag();
+                Logger.log(View.OnClickListener.class, "Removing student %s from inactive to import", viewHolder.student);
                 m_studentManager.moveStudent(StudentListType.INACTIVE, StudentListType.IMPORT, viewHolder.student);
             }
         };
-    }
-
-    private static final class InactiveViewHolder extends ViewHolder
-    {
     }
 }
