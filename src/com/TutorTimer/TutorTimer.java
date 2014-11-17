@@ -76,7 +76,7 @@ public class TutorTimer extends Activity
                 Logger.log(this, msg);
                 for (int i = 0; i < numStudentsToAdd; ++i)
                 {
-                    m_studentManager.addStudent(String.format("Student_%d", System.nanoTime()));
+                    m_studentManager.addStudentToImportList(String.format("Student_%d", System.nanoTime()));
                 }
 
                 runOnUiThread(new Runnable()
@@ -94,7 +94,7 @@ public class TutorTimer extends Activity
 
     public void clearStudents(View view)
     {
-        m_studentManager.clearStudents();
+        m_studentManager.clearImportStudents();
     }
 
     public void addNewStudent(View view)
@@ -102,9 +102,9 @@ public class TutorTimer extends Activity
         EditText newStudentText = (EditText) findViewById(R.id.new_student_name);
         String newStudentName = newStudentText.getText().toString();
 
-        if (newStudentName != null && newStudentName.length() != 0)
+        if (newStudentName.length() != 0)
         {
-            m_studentManager.addStudent(newStudentName);
+            m_studentManager.addStudentToImportList(newStudentName);
         }
 
         newStudentText.setText("");

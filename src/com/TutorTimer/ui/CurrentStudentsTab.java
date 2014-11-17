@@ -5,11 +5,10 @@ import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.widget.ListView;
 import com.TutorTimer.R;
-import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager;
-import com.TutorTimer.utils.CurrentStudentEntry;
-import com.TutorTimer.utils.CurrentStudentRoster;
-import com.TutorTimer.utils.TimerFactory;
+import com.TutorTimer.students.StudentManager.StudentListType;
+import com.TutorTimer.ui.adapters.ActiveStudentsArrayAdapter;
+import com.TutorTimer.ui.adapters.InactiveStudentsArrayAdapter;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -26,62 +25,74 @@ class CurrentStudentsTab extends TutorTab
         return tab;
     }
 
-    private final CurrentStudentsArrayAdapter m_currentStudentsAdapter;
-    private final CurrentStudentRoster        m_studentRoster;
-    private final TimerFactory                m_timerFactory;
+    private final ActiveStudentsArrayAdapter   m_activeStudentsAdapter;
+    private final InactiveStudentsArrayAdapter m_inactiveStudentsAdapter;
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
     {
         m_activity.setContentView(R.layout.current_students_view);
-        ListView currentStudentList = (ListView) m_activity.findViewById(R.id.current_student_list);
-        currentStudentList.setAdapter(m_currentStudentsAdapter);
+
+        ListView activeStudentList = (ListView) m_activity.findViewById(R.id.active_student_list);
+        activeStudentList.setAdapter(m_activeStudentsAdapter);
+
+        ListView inactiveStudentList = (ListView) m_activity.findViewById(R.id.inactive_student_list);
+        inactiveStudentList.setAdapter(m_inactiveStudentsAdapter);
     }
 
     private CurrentStudentsTab(Activity activity, ThreadPoolExecutor threadPool)
     {
         super(activity, threadPool);
 
-        m_timerFactory = TimerFactory.getInstance(activity);
-        m_studentRoster = new CurrentStudentRoster();
-        m_currentStudentsAdapter = new CurrentStudentsArrayAdapter(activity,
-                                                                   R.layout.current_students_view,
-                                                                   m_studentRoster);
+        StudentManager studentManager = StudentManager.getInstance(activity);
 
-        ListView currentStudentList = (ListView) activity.findViewById(R.id.current_student_list);
-        currentStudentList.setAdapter(m_currentStudentsAdapter);
+        // set the active students list
+        m_activeStudentsAdapter = new ActiveStudentsArrayAdapter(activity,
+                                                                 R.layout.current_students_view,
+                                                                 studentManager.getStudentListForType(StudentListType.ACTIVE));
+        ListView activeStudentList = (ListView) activity.findViewById(R.id.active_student_list);
+        activeStudentList.setAdapter(m_activeStudentsAdapter);
 
-        m_studentManager.registerObserver(new StudentManager.CurrentStudentObserver()
+        // setup the inactive students list
+        m_inactiveStudentsAdapter = new InactiveStudentsArrayAdapter(activity,
+                                                                     R.layout.current_students_view,
+                                                                     studentManager.getStudentListForType(StudentListType.INACTIVE));
+
+        ListView inactiveStudentList = (ListView) activity.findViewById(R.id.inactive_student_list);
+        inactiveStudentList.setAdapter(m_inactiveStudentsAdapter);
+
+        // register callbacks
+        m_studentManager.registerObserver(StudentListType.ACTIVE, new StudentManager.StudentListObserver()
         {
             @Override
-            public void onStudentAdded(Student student)
+            public void onListChanged()
             {
-                m_studentRoster.addStudent(new CurrentStudentEntry(student, m_timerFactory.getResetDuration()));
-                m_threadPool.submit(new LoadCurrentStudentsTask());
-            }
-
-            @Override
-            public void onStudentRemoved(Student student)
-            {
-                m_studentRoster.removeStudent(new CurrentStudentEntry(student, 0L));
-                m_threadPool.submit(new LoadCurrentStudentsTask());
+                m_activity.runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        m_activeStudentsAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         });
-    }
 
-    private class LoadCurrentStudentsTask implements Runnable
-    {
-        @Override
-        public void run()
+        m_studentManager.registerObserver(StudentListType.INACTIVE, new StudentManager.StudentListObserver()
         {
-            m_activity.runOnUiThread(new Runnable()
+            @Override
+            public void onListChanged()
             {
-                @Override
-                public void run()
+                m_activity.runOnUiThread(new Runnable()
                 {
-                    m_currentStudentsAdapter.notifyDataSetChanged();
-                }
-            });
-        }
+                    @Override
+                    public void run()
+                    {
+                        m_inactiveStudentsAdapter.notifyDataSetChanged();
+                    }
+                });
+
+            }
+        });
     }
 }

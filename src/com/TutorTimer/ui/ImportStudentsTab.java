@@ -4,13 +4,11 @@ import android.app.ActionBar;
 import android.app.Activity;
 import android.app.FragmentTransaction;
 import android.widget.ListView;
-import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.R;
-import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager;
+import com.TutorTimer.students.StudentManager.StudentListType;
+import com.TutorTimer.ui.adapters.ImportStudentsArrayAdapter;
 
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
 
 class ImportStudentsTab extends TutorTab
@@ -31,54 +29,32 @@ class ImportStudentsTab extends TutorTab
 
         ListView studentList = (ListView) m_activity.findViewById(R.id.import_student_list);
         studentList.setAdapter(m_importStudentsArrayAdapter);
-
-        m_threadPool.submit(new LoadStudentsTask());
     }
 
     final ImportStudentsArrayAdapter m_importStudentsArrayAdapter;
-    final List<Student>              m_importableStudents;
 
     private ImportStudentsTab(final Activity activity, ThreadPoolExecutor threadPool)
     {
         super(activity, threadPool);
 
-        m_importableStudents = new LinkedList<Student>();
-        m_importStudentsArrayAdapter = new ImportStudentsArrayAdapter(activity, R.layout.import_student_entry, m_importableStudents);
-
-        m_studentManager.registerObserver(new StudentManager.RosterChangeObserver()
+        StudentManager studentManager = StudentManager.getInstance(activity);
+        m_importStudentsArrayAdapter = new ImportStudentsArrayAdapter(activity,
+                                                                      R.layout.import_student_entry,
+                                                                      studentManager.getStudentListForType(StudentListType.IMPORT));
+        studentManager.registerObserver(StudentListType.IMPORT, new StudentManager.StudentListObserver()
         {
             @Override
-            public void onRosterChange()
+            public void onListChanged()
             {
-                m_threadPool.submit(new LoadStudentsTask());
+                activity.runOnUiThread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        m_importStudentsArrayAdapter.notifyDataSetChanged();
+                    }
+                });
             }
         });
-    }
-
-    private class LoadStudentsTask implements Runnable
-    {
-        @Override
-        public void run()
-        {
-            Logger.log(this, "Loading students");
-
-            final List<Student> allStudents = m_studentManager.getStudents();
-
-            m_activity.runOnUiThread(new Runnable()
-            {
-                @Override
-                public void run()
-                {
-                    m_importableStudents.clear();
-
-                    for (Student student : allStudents)
-                    {
-                        m_importableStudents.add(student);
-                    }
-
-                    m_importStudentsArrayAdapter.notifyDataSetChanged();
-                }
-            });
-        }
     }
 }

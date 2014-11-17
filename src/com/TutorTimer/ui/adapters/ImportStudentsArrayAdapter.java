@@ -1,4 +1,4 @@
-package com.TutorTimer.ui;
+package com.TutorTimer.ui.adapters;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -11,6 +11,7 @@ import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.R;
 import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager;
+import com.TutorTimer.students.StudentManager.StudentListType;
 import com.TutorTimer.utils.Utils;
 
 import java.util.List;
@@ -49,7 +50,7 @@ public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
                     String msg = String.format("Importing student %s", student);
                     Logger.log(this, msg);
                     Utils.shortToast(getContext(), msg);
-                    m_studentManager.addToCurrentStudents(student);
+                    m_studentManager.moveStudent(StudentListType.IMPORT, StudentListType.INACTIVE, student);
                 }
             });
 
@@ -60,7 +61,7 @@ public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
                 {
                     Student student = (Student) v.getTag();
                     Logger.log(this, "Deleting student %s", student);
-                    m_studentManager.deleteStudent(student.getId());
+                    m_studentManager.removeImportStudent(student);
                 }
             });
 

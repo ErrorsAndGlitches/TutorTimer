@@ -6,32 +6,45 @@ import android.database.Cursor;
 import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.database.Database;
 import com.TutorTimer.database.DbUtils;
+import com.TutorTimer.utils.TimerFactory;
 
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
+/**
+ * Managers the list of imported, active, and inactive students
+ */
 public class StudentManager
 {
     private static StudentManager s_studentManager;
+    private static final Map<StudentListType, Comparator<Student>> s_studentListComparators = new HashMap<StudentListType, Comparator<Student>>();
 
-    private final Database                     m_database;
-    private final List<StudentManagerObserver> m_observers;
-    private final List<Student>                m_currentStudents;
-
-    public interface StudentManagerObserver
+    static
     {
+        s_studentListComparators.put(StudentListType.IMPORT, new StudentNameComparator());
+        s_studentListComparators.put(StudentListType.INACTIVE, new StudentNameComparator());
+        s_studentListComparators.put(StudentListType.ACTIVE, new StudentTimeLeftComparator());
     }
 
-    public interface RosterChangeObserver extends StudentManagerObserver
+    private final Database                                        m_database;
+    private final TimerFactory                                    m_timerFactory;
+    private final Map<StudentListType, List<Student>>             m_studentLists;
+    private final Map<StudentListType, List<StudentListObserver>> m_studentObserversList;
+
+    public interface StudentListObserver
     {
-        public void onRosterChange();
+        void onListChanged();
     }
 
-    public interface CurrentStudentObserver extends StudentManagerObserver
+    public enum StudentListType
     {
-        public void onStudentAdded(Student student);
-
-        public void onStudentRemoved(Student student);
+        IMPORT,
+        ACTIVE,
+        INACTIVE
     }
 
     public static StudentManager getInstance(Context context)
@@ -50,7 +63,49 @@ public class StudentManager
         return s_studentManager;
     }
 
-    public void addStudent(final String name)
+    public List<Student> getStudentListForType(StudentListType type)
+    {
+        return Collections.unmodifiableList(m_studentLists.get(type));
+    }
+
+    public void registerObserver(StudentListType type, StudentListObserver observer)
+    {
+        m_studentObserversList.get(type).add(observer);
+    }
+
+    public void moveStudent(StudentListType fromType, StudentListType toType, Student student)
+    {
+        if (fromType == toType)
+        {
+            return;
+        }
+
+        // get the student that is being removed
+        boolean wasStudentRemoved = removeStudent(fromType, student);
+        if (!wasStudentRemoved)
+        {
+            return;
+        }
+
+        // put the student in its new location
+        addStudentToListType(toType, student);
+
+        // send out the notifications
+        notifyStudentListObserversForType(fromType);
+        notifyStudentListObserversForType(toType);
+    }
+
+    public boolean removeStudent(StudentListType type, Student student)
+    {
+        boolean wasStudentRemoved = m_studentLists.get(type).remove(student);
+        if (wasStudentRemoved)
+        {
+            notifyStudentListObserversForType(type);
+        }
+        return wasStudentRemoved;
+    }
+
+    public void addStudentToImportList(final String name)
     {
         long id = -1;
 
@@ -95,49 +150,35 @@ public class StudentManager
 
         if (id != -1)
         {
-            notifyRosterChange();
+            addStudentToListType(StudentListType.IMPORT, new Student(id, name, m_timerFactory.getResetDuration()));
+            notifyStudentListObserversForType(StudentListType.IMPORT);
         }
     }
 
-    public List<Student> getStudents()
+    public boolean removeImportStudent(Student student)
     {
-        final List<Student> students = new LinkedList<Student>();
+        boolean studentRemoved = m_studentLists.get(StudentListType.IMPORT).remove(student);
 
-        DbUtils.databaseQuery(m_database, new DbUtils.QueryProcessor()
+        if (studentRemoved)
         {
-            @Override
-            public Cursor performQuery(Database.Transaction transaction)
+            Database.Transaction transaction = m_database.beginTransaction();
+            try
             {
-                return transaction.query("SELECT id, name FROM students", null);
+                transaction.execSql("DELETE FROM students WHERE id = ?", new String[]{String.valueOf(student.getId())});
+                transaction.setSuccessful();
+            }
+            finally
+            {
+                transaction.endTransaction();
             }
 
-            @Override
-            public void process(Cursor cursor)
-            {
-                students.add(new Student(cursor.getLong(0), cursor.getString(1)));
-            }
-        });
-
-        return students;
-    }
-
-    public void deleteStudent(long id)
-    {
-        Database.Transaction transaction = m_database.beginTransaction();
-        try
-        {
-            transaction.execSql("DELETE FROM students WHERE id = ?", new String[]{String.valueOf(id)});
-            transaction.setSuccessful();
-        }
-        finally
-        {
-            transaction.endTransaction();
+            notifyStudentListObserversForType(StudentListType.IMPORT);
         }
 
-        notifyRosterChange();
+        return studentRemoved;
     }
 
-    public void clearStudents()
+    public void clearImportStudents()
     {
         Database.Transaction transaction = m_database.beginTransaction();
         try
@@ -150,74 +191,79 @@ public class StudentManager
             transaction.endTransaction();
         }
 
-        notifyRosterChange();
+        m_studentLists.get(StudentListType.IMPORT).clear();
+        notifyStudentListObserversForType(StudentListType.IMPORT);
     }
 
-    public void addToCurrentStudents(Student student)
+    private void addStudentToListType(StudentListType type, Student student)
     {
-        if (!m_currentStudents.contains(student))
+        List<Student> studentList = m_studentLists.get(type);
+        studentList.add(student);
+        Collections.sort(studentList, s_studentListComparators.get(type));
+    }
+
+    private void notifyStudentListObserversForType(StudentListType type)
+    {
+        for (StudentListObserver observer : m_studentObserversList.get(type))
         {
-            m_currentStudents.add(student);
-            notifyCurrentStudentAdded(student);
+            observer.onListChanged();
         }
-    }
-
-    public void removeFromCurrentStudents(Student student)
-    {
-        if (m_currentStudents.contains(student))
-        {
-            m_currentStudents.remove(student);
-            notifyCurrentStudentRemoved(student);
-        }
-    }
-
-    public List<Student> getCurrentStudents()
-    {
-        return new LinkedList<Student>(m_currentStudents);
-    }
-
-    public void registerObserver(StudentManagerObserver observer)
-    {
-        m_observers.add(observer);
     }
 
     private StudentManager(Context context)
     {
         m_database = new Database(context);
-        m_observers = new LinkedList<StudentManagerObserver>();
-        m_currentStudents = new LinkedList<Student>();
+        m_timerFactory = TimerFactory.getInstance(context);
+
+        m_studentLists = new HashMap<StudentListType, List<Student>>();
+        m_studentObserversList = new HashMap<StudentListType, List<StudentListObserver>>();
+        for (StudentListType type : StudentListType.values())
+        {
+            m_studentLists.put(type, new LinkedList<Student>());
+            m_studentObserversList.put(type, new LinkedList<StudentListObserver>());
+        }
+
+        // populate the import students list
+        loadStudentsFromDb();
     }
 
-    private void notifyRosterChange()
+    private void loadStudentsFromDb()
     {
-        for (StudentManagerObserver observer : m_observers)
+        final List<Student> studentList = m_studentLists.get(StudentListType.IMPORT);
+
+        DbUtils.databaseQuery(m_database, new DbUtils.QueryProcessor()
         {
-            if (observer instanceof RosterChangeObserver)
+            @Override
+            public Cursor performQuery(Database.Transaction transaction)
             {
-                ((RosterChangeObserver) observer).onRosterChange();
+                return transaction.query("SELECT id, name FROM students", null);
             }
+
+            @Override
+            public void process(Cursor cursor)
+            {
+                studentList.add(new Student(cursor.getLong(0), cursor.getString(1), m_timerFactory.getResetDuration()));
+            }
+        });
+
+        Collections.sort(studentList, s_studentListComparators.get(StudentListType.IMPORT));
+    }
+
+    private static class StudentNameComparator implements Comparator<Student>
+    {
+        @Override
+        public int compare(Student lhs, Student rhs)
+        {
+            return lhs.getName().toLowerCase().compareTo(rhs.getName().toLowerCase());
         }
     }
 
-    private void notifyCurrentStudentAdded(Student student)
+    private static class StudentTimeLeftComparator implements Comparator<Student>
     {
-        for (StudentManagerObserver observer : m_observers)
+        @Override
+        public int compare(Student lhs, Student rhs)
         {
-            if (observer instanceof CurrentStudentObserver)
-            {
-                ((CurrentStudentObserver) observer).onStudentAdded(student);
-            }
-        }
-    }
-
-    private void notifyCurrentStudentRemoved(Student student)
-    {
-        for (StudentManagerObserver observer : m_observers)
-        {
-            if (observer instanceof CurrentStudentObserver)
-            {
-                ((CurrentStudentObserver) observer).onStudentRemoved(student);
-            }
+            return (int) (lhs.getTimeLeft() - rhs.getTimeLeft());
         }
     }
 }

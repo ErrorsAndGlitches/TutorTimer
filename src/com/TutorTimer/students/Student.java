@@ -2,13 +2,25 @@ package com.TutorTimer.students;
 
 public class Student
 {
-    private final String m_name;
-    private final long   m_id;
+    private final String     m_name;
+    private final long       m_id;
+    private       long       m_resetTime;
+    private       long       m_timeLeft;
+    private       TimerState m_timerState;
 
-    Student(long id, String name)
+    public enum TimerState
+    {
+        STARTED,
+        STOPPED
+    }
+
+    Student(long id, String name, long resetTime)
     {
         m_id = id;
         m_name = name;
+        m_resetTime = resetTime;
+        m_timeLeft = m_resetTime;
+        m_timerState = TimerState.STOPPED;
     }
 
     public long getId()
@@ -19,6 +31,40 @@ public class Student
     public String getName()
     {
         return m_name;
+    }
+
+    public long getResetTime()
+    {
+        return m_resetTime;
+    }
+
+    public void addToResetTime(long delta)
+    {
+        long newResetTime = m_resetTime + delta;
+        if (newResetTime > 0)
+        {
+            m_resetTime = newResetTime;
+        }
+    }
+
+    public long getTimeLeft()
+    {
+        return m_timeLeft;
+    }
+
+    public void setTimeLeft(long timeLeft)
+    {
+        m_timeLeft = timeLeft;
+    }
+
+    public void setTimerState(TimerState newState)
+    {
+        m_timerState = newState;
+    }
+
+    public boolean isTimerStopped()
+    {
+        return TimerState.STOPPED == m_timerState;
     }
 
     @Override
