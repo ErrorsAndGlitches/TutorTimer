@@ -13,19 +13,11 @@ import java.util.List;
  */
 public class InactiveStudentsArrayAdapter extends StudentsArrayAdapter
 {
-    private static final String IMPORT_STRING = "Import";
-
     public InactiveStudentsArrayAdapter(Activity activity,
                                         int resource,
                                         List<Student> studentList)
     {
         super(activity, resource, studentList);
-    }
-
-    @Override
-    String getImportRemoveButtonText()
-    {
-        return IMPORT_STRING;
     }
 
     @Override
@@ -46,16 +38,36 @@ public class InactiveStudentsArrayAdapter extends StudentsArrayAdapter
     }
 
     @Override
-    View.OnClickListener getImportRemoveClickListener()
+    FlingListener getFlingListener()
     {
-        return new View.OnClickListener()
+        return new FlingListener()
         {
             @Override
-            public void onClick(View v)
+            public boolean isLeftFlingable()
             {
-                ViewHolder viewHolder = (ViewHolder) v.getTag();
+                return true;
+            }
+
+            @Override
+            public boolean isRightFlingable()
+            {
+                return true;
+            }
+
+            @Override
+            public void onFlingLeftAnimationEnd(View view)
+            {
+                ViewHolder viewHolder = (ViewHolder) view.getTag();
                 Logger.log(View.OnClickListener.class, "Starting the timer for student %s", viewHolder.student);
                 m_studentManager.moveStudent(StudentListType.INACTIVE, StudentListType.ACTIVE, viewHolder.student);
+            }
+
+            @Override
+            public void onFlingRightAnimationEnd(View view)
+            {
+                ViewHolder viewHolder = (ViewHolder) view.getTag();
+                Logger.log(View.OnClickListener.class, "Deleting the student %s", viewHolder.student);
+                m_studentManager.removeImportStudent(viewHolder.student);
             }
         };
     }

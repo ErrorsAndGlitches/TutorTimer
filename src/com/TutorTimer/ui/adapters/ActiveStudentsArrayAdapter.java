@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
 {
-    private static final String REMOVE_STRING             = "Remove";
     private static final int    NO_TIME_LEFT              = 15000;
     private static final int    RUNNING_OUT_OF_TIME_COLOR = Color.RED;
 
@@ -67,12 +66,6 @@ public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
     }
 
     @Override
-    String getImportRemoveButtonText()
-    {
-        return REMOVE_STRING;
-    }
-
-    @Override
     View.OnClickListener getResetTimeClickListener()
     {
         return new View.OnClickListener()
@@ -99,14 +92,31 @@ public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
     }
 
     @Override
-    View.OnClickListener getImportRemoveClickListener()
+    FlingListener getFlingListener()
     {
-        return new View.OnClickListener()
+        return new FlingListener()
         {
             @Override
-            public void onClick(View v)
+            public boolean isLeftFlingable()
             {
-                ViewHolder viewHolder = (ViewHolder) v.getTag();
+                return false;
+            }
+
+            @Override
+            public boolean isRightFlingable()
+            {
+                return true;
+            }
+
+            @Override
+            public void onFlingLeftAnimationEnd(View view)
+            {
+            }
+
+            @Override
+            public void onFlingRightAnimationEnd(View view)
+            {
+                ViewHolder viewHolder = (ViewHolder) view.getTag();
                 Student student = viewHolder.student;
 
                 Logger.log(View.OnClickListener.class, "Removing student %s from active to inactive", student);

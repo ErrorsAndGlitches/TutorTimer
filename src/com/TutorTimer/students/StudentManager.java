@@ -89,16 +89,6 @@ public class StudentManager
         addStudentToListType(toType, student);
     }
 
-    public boolean removeStudent(StudentListType type, Student student)
-    {
-        boolean wasStudentRemoved = m_studentLists.get(type).remove(student);
-        if (wasStudentRemoved)
-        {
-            notifyStudentListObserversForType(type);
-        }
-        return wasStudentRemoved;
-    }
-
     public void addStudentToImportList(final String name)
     {
         long id = -1;
@@ -200,6 +190,16 @@ public class StudentManager
         studentList.add(student);
         Collections.sort(studentList, s_studentListComparators.get(type));
         notifyStudentListObserversForType(type);
+    }
+
+    private boolean removeStudent(StudentListType type, Student student)
+    {
+        boolean wasStudentRemoved = m_studentLists.get(type).remove(student);
+        if (wasStudentRemoved)
+        {
+            notifyStudentListObserversForType(type);
+        }
+        return wasStudentRemoved;
     }
 
     private void notifyStudentListObserversForType(StudentListType type)

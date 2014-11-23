@@ -4,10 +4,12 @@ import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.NumberPicker;
 import android.widget.TextView;
 import com.TutorTimer.Logger.Logger;
@@ -24,6 +26,18 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 {
     private static final String[] SECOND_RESET_STRINGS = {"00", "30"};
     private static final long[]   SECOND_RESET_VALUES  = {0, 30};
+    private static final float    FLING_DISTANCE       = 100.0f;
+
+    static interface FlingListener
+    {
+        boolean isLeftFlingable();
+
+        boolean isRightFlingable();
+
+        void onFlingLeftAnimationEnd(View view);
+
+        void onFlingRightAnimationEnd(View view);
+    }
 
     static class ViewHolder
     {
@@ -39,9 +53,6 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         // reset time pickers
         NumberPicker minPicker;
         NumberPicker secPicker;
-
-        // buttons
-        Button importRemoveButton;
 
         // default color
         int defaultColor;
@@ -87,23 +98,15 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
             viewHolder.secPicker.setMaxValue(1);
             viewHolder.secPicker.setDisplayedValues(SECOND_RESET_STRINGS);
 
-            // reset, remove buttons
-            viewHolder.importRemoveButton = (Button) rowView.findViewById(R.id.import_remove_current_student);
-
             // create the click listeners
             viewHolder.timeLeftTextView.setOnClickListener(getResetTimeClickListener());
             viewHolder.minPicker.setOnValueChangedListener(getNumberPickerListener());
             viewHolder.secPicker.setOnValueChangedListener(getNumberPickerListener());
-            viewHolder.importRemoveButton.setOnClickListener(getImportRemoveClickListener());
-
-            // set the text of the start/pause button
-            viewHolder.importRemoveButton.setText(getImportRemoveButtonText());
 
             // add the tags to all of the view's members
             viewHolder.timeLeftTextView.setTag(viewHolder);
             viewHolder.minPicker.setTag(viewHolder);
             viewHolder.secPicker.setTag(viewHolder);
-            viewHolder.importRemoveButton.setTag(viewHolder);
 
             rowView.setTag(viewHolder);
         }
@@ -131,14 +134,14 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         // set the color of the parent view and save in view holder
         setViewColor(position, rowView, viewHolder);
 
+        rowView.setOnTouchListener(new FlingTouchListener());
+
         return rowView;
     }
 
     abstract View.OnClickListener getResetTimeClickListener();
 
-    abstract View.OnClickListener getImportRemoveClickListener();
-
-    abstract String getImportRemoveButtonText();
+    abstract FlingListener getFlingListener();
 
     static void resetTimeLeftTextView(ViewHolder viewHolder)
     {
@@ -201,5 +204,90 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
                 holder.student.setResetTime(TimeUnit.SECONDS.toMillis(newTime));
             }
         };
+    }
+
+    private class FlingTouchListener implements View.OnTouchListener
+    {
+        private final FlingListener m_flingListener = getFlingListener();
+        private float m_startX;
+        private int   m_index;
+
+        @Override
+        public boolean onTouch(View v, MotionEvent event)
+        {
+            Logger.log(View.OnTouchListener.class, "Received event %d", event.getAction());
+            switch (event.getAction())
+            {
+            case MotionEvent.ACTION_DOWN:
+                m_index = event.getPointerId(0);
+                m_startX = event.getX(m_index);
+                break;
+            case MotionEvent.ACTION_MOVE:
+                float diff = event.getX(m_index) - m_startX;
+                Logger.log(View.OnTouchListener.class, "Difference: %.2f", diff);
+                if (diff > FLING_DISTANCE && m_flingListener.isRightFlingable())
+                {
+                    v.startAnimation(getRightFlingAnimation(v));
+                }
+                else if (diff < -FLING_DISTANCE && m_flingListener.isLeftFlingable())
+                {
+                    v.startAnimation(getLeftFlingAnimation(v));
+                }
+
+                break;
+            }
+
+            return true;
+        }
+
+        private Animation getLeftFlingAnimation(final View view)
+        {
+            Animation slideLeftAnim = AnimationUtils.loadAnimation(m_activity, R.anim.slide_left);
+            slideLeftAnim.setAnimationListener(new Animation.AnimationListener()
+            {
+                @Override
+                public void onAnimationStart(Animation animation)
+                {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation)
+                {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation)
+                {
+                    m_flingListener.onFlingLeftAnimationEnd(view);
+                }
+            });
+
+            return slideLeftAnim;
+        }
+
+        private Animation getRightFlingAnimation(final View view)
+        {
+            Animation slideRightAnim = AnimationUtils.loadAnimation(m_activity, R.anim.slide_right);
+            slideRightAnim.setAnimationListener(new Animation.AnimationListener()
+            {
+                @Override
+                public void onAnimationStart(Animation animation)
+                {
+                }
+
+                @Override
+                public void onAnimationRepeat(Animation animation)
+                {
+                }
+
+                @Override
+                public void onAnimationEnd(Animation animation)
+                {
+                    m_flingListener.onFlingRightAnimationEnd(view);
+                }
+            });
+
+            return slideRightAnim;
+        }
     }
 }

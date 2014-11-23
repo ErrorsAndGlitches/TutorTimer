@@ -18,45 +18,24 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerVertical="true"
-            android:paddingRight="20px"
-            android:layout_toLeftOf="@+id/reset_time_change_buttons"
+            android:paddingEnd="10dp"
+            android:layout_toLeftOf="@+id/min_reset_time_picker"
             android:id="@+id/time_left_for_student"/>
 
-    <LinearLayout
-            android:layout_height="wrap_content"
+    <NumberPicker
+            android:id="@+id/min_reset_time_picker"
+            android:layout_toLeftOf="@+id/sec_reset_time_picker"
             android:layout_width="wrap_content"
-            android:orientation="horizontal"
-            android:layout_toLeftOf="@+id/reset_remove_buttons"
-            android:id="@+id/reset_time_change_buttons">
+            android:layout_height="100dp"
+            android:scaleX="0.8"
+            android:scaleY="0.8"/>
 
-        <NumberPicker
-                android:id="@+id/min_reset_time_picker"
-                android:layout_width="wrap_content"
-                android:layout_height="200px"
-                android:scaleX="0.8"
-                android:scaleY="0.8"/>
-
-        <NumberPicker
-                android:id="@+id/sec_reset_time_picker"
-                android:layout_width="wrap_content"
-                android:layout_height="200px"
-                android:scaleX="0.8"
-                android:scaleY="0.8"/>
-
-    </LinearLayout>
-
-    <LinearLayout
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:orientation="vertical"
+    <NumberPicker
+            android:id="@+id/sec_reset_time_picker"
             android:layout_alignParentRight="true"
-            android:id="@+id/reset_remove_buttons">
-
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/import_remove_current_student"/>
-
-    </LinearLayout>
+            android:layout_width="wrap_content"
+            android:layout_height="100dp"
+            android:scaleX="0.8"
+            android:scaleY="0.8"/>
 
 </RelativeLayout>
