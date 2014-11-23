@@ -26,7 +26,6 @@ public class StudentManager
     static
     {
         s_studentListComparators.put(StudentListType.IMPORT, new StudentNameComparator());
-        s_studentListComparators.put(StudentListType.INACTIVE, new StudentNameComparator());
         s_studentListComparators.put(StudentListType.ACTIVE, new StudentTimeLeftComparator());
     }
 
@@ -44,7 +43,6 @@ public class StudentManager
     {
         IMPORT,
         ACTIVE,
-        INACTIVE
     }
 
     public static StudentManager getInstance(Context context)

@@ -19,8 +19,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
 {
-    private static final String PAUSE_STRING     = "Pause";
-    private static final int    NO_TIME_LEFT_SEC = 15;
+    private static final int NO_TIME_LEFT_SEC = 15;
 
     public ActiveStudentsArrayAdapter(Activity activity,
                                       int resource,
@@ -61,12 +60,6 @@ public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
     }
 
     @Override
-    String getStartPauseButtonText()
-    {
-        return PAUSE_STRING;
-    }
-
-    @Override
     View.OnClickListener getResetClickListener()
     {
         return new View.OnClickListener()
@@ -88,24 +81,6 @@ public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
 
                 // the reset time may rearrange the entries in the backing list thus it needs to be resorted
                 StudentManager.getInstance(m_activity).resortActiveStudentList();
-            }
-        };
-    }
-
-    @Override
-    View.OnClickListener getStartPauseClickListener()
-    {
-        return new View.OnClickListener()
-        {
-            @Override
-            public void onClick(View v)
-            {
-                ViewHolder viewHolder = (ViewHolder) v.getTag();
-                Student student = viewHolder.student;
-
-                Logger.log(View.OnClickListener.class, "Pausing the timer for student %s", student);
-                student.stopTimer();
-                m_studentManager.moveStudent(StudentListType.ACTIVE, StudentListType.INACTIVE, student);
             }
         };
     }
@@ -171,11 +146,11 @@ public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
             {
                 if (timeLeftSec % 2 == 0)
                 {
-                    m_entryView.setBackgroundColor(m_defaultColor);
+                    m_entryView.setBackgroundColor(RUNNING_OUT_OF_TIME_COLOR);
                 }
                 else
                 {
-                    m_entryView.setBackgroundColor(RUNNING_OUT_OF_TIME_COLOR);
+                    m_entryView.setBackgroundColor(m_defaultColor);
                 }
             }
 

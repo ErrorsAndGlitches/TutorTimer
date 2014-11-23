@@ -8,7 +8,6 @@ import com.TutorTimer.R;
 import com.TutorTimer.students.StudentManager;
 import com.TutorTimer.students.StudentManager.StudentListType;
 import com.TutorTimer.ui.adapters.ActiveStudentsArrayAdapter;
-import com.TutorTimer.ui.adapters.InactiveStudentsArrayAdapter;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -25,8 +24,7 @@ class CurrentStudentsTab extends TutorTab
         return tab;
     }
 
-    private final ActiveStudentsArrayAdapter   m_activeStudentsAdapter;
-    private final InactiveStudentsArrayAdapter m_inactiveStudentsAdapter;
+    private final ActiveStudentsArrayAdapter m_activeStudentsAdapter;
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
@@ -35,9 +33,6 @@ class CurrentStudentsTab extends TutorTab
 
         ListView activeStudentList = (ListView) m_activity.findViewById(R.id.active_student_list);
         activeStudentList.setAdapter(m_activeStudentsAdapter);
-
-        ListView inactiveStudentList = (ListView) m_activity.findViewById(R.id.inactive_student_list);
-        inactiveStudentList.setAdapter(m_inactiveStudentsAdapter);
     }
 
     private CurrentStudentsTab(Activity activity, ThreadPoolExecutor threadPool)
@@ -53,14 +48,6 @@ class CurrentStudentsTab extends TutorTab
         ListView activeStudentList = (ListView) activity.findViewById(R.id.active_student_list);
         activeStudentList.setAdapter(m_activeStudentsAdapter);
 
-        // setup the inactive students list
-        m_inactiveStudentsAdapter = new InactiveStudentsArrayAdapter(activity,
-                                                                     R.layout.current_students_view,
-                                                                     studentManager.getStudentListForType(StudentListType.INACTIVE));
-
-        ListView inactiveStudentList = (ListView) activity.findViewById(R.id.inactive_student_list);
-        inactiveStudentList.setAdapter(m_inactiveStudentsAdapter);
-
         // register callbacks
         m_studentManager.registerObserver(StudentListType.ACTIVE, new StudentManager.StudentListObserver()
         {
@@ -75,23 +62,6 @@ class CurrentStudentsTab extends TutorTab
                         m_activeStudentsAdapter.notifyDataSetChanged();
                     }
                 });
-            }
-        });
-
-        m_studentManager.registerObserver(StudentListType.INACTIVE, new StudentManager.StudentListObserver()
-        {
-            @Override
-            public void onListChanged()
-            {
-                m_activity.runOnUiThread(new Runnable()
-                {
-                    @Override
-                    public void run()
-                    {
-                        m_inactiveStudentsAdapter.notifyDataSetChanged();
-                    }
-                });
-
             }
         });
     }

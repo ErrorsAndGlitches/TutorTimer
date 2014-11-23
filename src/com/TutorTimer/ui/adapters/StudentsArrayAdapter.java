@@ -33,7 +33,6 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         TextView resetTimeTextView;
 
         // buttons
-        Button startPauseButton;
         Button incTimeButton;
         Button decTimeButton;
         Button resetTimerButton;
@@ -74,9 +73,6 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
             viewHolder.timeLeftTextView = (TextView) rowView.findViewById(R.id.time_left_for_student);
             viewHolder.resetTimeTextView = (TextView) rowView.findViewById(R.id.reset_time);
 
-            // start, stop buttons
-            viewHolder.startPauseButton = (Button) rowView.findViewById(R.id.start_pause_timer_button);
-
             // increase and decrease reset time buttons
             viewHolder.incTimeButton = (Button) rowView.findViewById(R.id.increase_time_button);
             viewHolder.decTimeButton = (Button) rowView.findViewById(R.id.decrease_time_button);
@@ -86,17 +82,12 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
             viewHolder.removeFromStudentsButton = (Button) rowView.findViewById(R.id.remove_current_student);
 
             // create the click listeners
-            viewHolder.startPauseButton.setOnClickListener(getStartPauseClickListener());
             viewHolder.resetTimerButton.setOnClickListener(getResetClickListener());
             viewHolder.incTimeButton.setOnClickListener(getIncResetTimeClickListener());
             viewHolder.decTimeButton.setOnClickListener(getDecResetTimeClickListener());
             viewHolder.removeFromStudentsButton.setOnClickListener(getRemoveClickListener());
 
-            // set the text of the start/pause button
-            viewHolder.startPauseButton.setText(getStartPauseButtonText());
-
             // add the tags to all of the view's members
-            viewHolder.startPauseButton.setTag(viewHolder);
             viewHolder.incTimeButton.setTag(viewHolder);
             viewHolder.decTimeButton.setTag(viewHolder);
             viewHolder.resetTimerButton.setTag(viewHolder);
@@ -131,18 +122,9 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         return rowView;
     }
 
-    abstract View.OnClickListener getStartPauseClickListener();
-
     abstract View.OnClickListener getResetClickListener();
 
     abstract View.OnClickListener getRemoveClickListener();
-
-    abstract String getStartPauseButtonText();
-
-    static void resetTimeLeftTextView(ViewHolder viewHolder)
-    {
-        Utils.setTextViewToTime(viewHolder.timeLeftTextView, viewHolder.student.getTimeLeft());
-    }
 
     static void resetBackgroundColor(ViewHolder viewHolder)
     {

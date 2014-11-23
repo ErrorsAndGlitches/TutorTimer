@@ -22,22 +22,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingRight="20px"
-            android:layout_toLeftOf="@+id/start_stop_buttons"
-            android:id="@+id/reset_time"/>
-
-    <LinearLayout
-            android:layout_height="wrap_content"
-            android:layout_width="wrap_content"
-            android:orientation="vertical"
             android:layout_toLeftOf="@+id/reset_time_change_buttons"
-            android:id="@+id/start_stop_buttons">
-
-        <Button
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/start_pause_timer_button"/>
-
-    </LinearLayout>
+            android:id="@+id/reset_time"/>
 
     <LinearLayout
             android:layout_height="wrap_content"

@@ -50,7 +50,7 @@ public class ImportStudentsArrayAdapter extends ArrayAdapter<Student>
                     String msg = String.format("Importing student %s", student);
                     Logger.log(this, msg);
                     Utils.shortToast(getContext(), msg);
-                    m_studentManager.moveStudent(StudentListType.IMPORT, StudentListType.INACTIVE, student);
+                    m_studentManager.moveStudent(StudentListType.IMPORT, StudentListType.ACTIVE, student);
                 }
             });
 
