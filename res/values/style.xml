@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="SmallText" parent="@android:style/TextAppearance">
-        <item name="android:textSize">14sp</item>
+    <style name="TextSize" parent="@android:style/TextAppearance">
+        <item name="android:textSize">30sp</item>
     </style>
 </resources>

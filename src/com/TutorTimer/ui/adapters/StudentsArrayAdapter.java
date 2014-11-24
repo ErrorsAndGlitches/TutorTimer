@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.R;
@@ -17,34 +18,39 @@ import com.TutorTimer.utils.TimerFactory;
 import com.TutorTimer.utils.Utils;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 {
+    private static final String[] SECOND_RESET_STRINGS = {"00", "30"};
+    private static final long[]   SECOND_RESET_VALUES  = {0, 30};
+
     static class ViewHolder
     {
         Student student;
 
-        // the "current_student_entry" view
+        // the "student_entry" view
         View entryView;
 
         // text shown on the UI
         TextView studentNameTextView;
         TextView timeLeftTextView;
-        TextView resetTimeTextView;
+
+        // reset time pickers
+        NumberPicker minPicker;
+        NumberPicker secPicker;
 
         // buttons
-        Button incTimeButton;
-        Button decTimeButton;
+        Button importRemoveButton;
         Button resetTimerButton;
-        Button removeFromStudentsButton;
 
         // default color
         int defaultColor;
     }
 
-    final Activity             m_activity;
-    final StudentManager       m_studentManager;
-    final TimerFactory         m_timerFactory;
+    final Activity       m_activity;
+    final StudentManager m_studentManager;
+    final TimerFactory   m_timerFactory;
 
     public StudentsArrayAdapter(Activity activity,
                                 int resource,
@@ -63,7 +69,7 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         if (convertView == null)
         {
             LayoutInflater inflater = (LayoutInflater) getContext().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-            rowView = inflater.inflate(R.layout.current_student_entry, parent, false);
+            rowView = inflater.inflate(R.layout.student_entry, parent, false);
 
             // create a view holder with all the links
             ViewHolder viewHolder = new ViewHolder();
@@ -71,27 +77,35 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 
             viewHolder.studentNameTextView = (TextView) rowView.findViewById(R.id.timer_student_name);
             viewHolder.timeLeftTextView = (TextView) rowView.findViewById(R.id.time_left_for_student);
-            viewHolder.resetTimeTextView = (TextView) rowView.findViewById(R.id.reset_time);
 
-            // increase and decrease reset time buttons
-            viewHolder.incTimeButton = (Button) rowView.findViewById(R.id.increase_time_button);
-            viewHolder.decTimeButton = (Button) rowView.findViewById(R.id.decrease_time_button);
+            // reset time pickers
+            viewHolder.minPicker = (NumberPicker) rowView.findViewById(R.id.min_reset_time_picker);
+            viewHolder.secPicker = (NumberPicker) rowView.findViewById(R.id.sec_reset_time_picker);
+
+            viewHolder.minPicker.setMinValue(0);
+            viewHolder.minPicker.setMaxValue(60);
+            viewHolder.secPicker.setMinValue(0);
+            viewHolder.secPicker.setMaxValue(1);
+            viewHolder.secPicker.setDisplayedValues(SECOND_RESET_STRINGS);
 
             // reset, remove buttons
+            viewHolder.importRemoveButton = (Button) rowView.findViewById(R.id.import_remove_current_student);
             viewHolder.resetTimerButton = (Button) rowView.findViewById(R.id.reset_timer_button);
-            viewHolder.removeFromStudentsButton = (Button) rowView.findViewById(R.id.remove_current_student);
 
             // create the click listeners
+            viewHolder.minPicker.setOnValueChangedListener(getNumberPickerListener());
+            viewHolder.secPicker.setOnValueChangedListener(getNumberPickerListener());
             viewHolder.resetTimerButton.setOnClickListener(getResetClickListener());
-            viewHolder.incTimeButton.setOnClickListener(getIncResetTimeClickListener());
-            viewHolder.decTimeButton.setOnClickListener(getDecResetTimeClickListener());
-            viewHolder.removeFromStudentsButton.setOnClickListener(getRemoveClickListener());
+            viewHolder.importRemoveButton.setOnClickListener(getImportRemoveClickListener());
+
+            // set the text of the start/pause button
+            viewHolder.importRemoveButton.setText(getImportRemoveButtonText());
 
             // add the tags to all of the view's members
-            viewHolder.incTimeButton.setTag(viewHolder);
-            viewHolder.decTimeButton.setTag(viewHolder);
+            viewHolder.minPicker.setTag(viewHolder);
+            viewHolder.secPicker.setTag(viewHolder);
+            viewHolder.importRemoveButton.setTag(viewHolder);
             viewHolder.resetTimerButton.setTag(viewHolder);
-            viewHolder.removeFromStudentsButton.setTag(viewHolder);
 
             rowView.setTag(viewHolder);
         }
@@ -114,7 +128,7 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 
         // set the time left and reset time
         Utils.setTextViewToTime(viewHolder.timeLeftTextView, student.getTimeLeft());
-        Utils.setTextViewToTime(viewHolder.resetTimeTextView, student.getResetTime());
+        setResetPickers(viewHolder);
 
         // set the color of the parent view and save in view holder
         setViewColor(position, rowView, viewHolder);
@@ -124,14 +138,21 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 
     abstract View.OnClickListener getResetClickListener();
 
-    abstract View.OnClickListener getRemoveClickListener();
+    abstract View.OnClickListener getImportRemoveClickListener();
+
+    abstract String getImportRemoveButtonText();
+
+    static void resetTimeLeftTextView(ViewHolder viewHolder)
+    {
+        Utils.setTextViewToTime(viewHolder.timeLeftTextView, viewHolder.student.getTimeLeft());
+    }
 
     static void resetBackgroundColor(ViewHolder viewHolder)
     {
         viewHolder.entryView.setBackgroundColor(viewHolder.defaultColor);
     }
 
-    private void setViewColor(int position, View rowView, ViewHolder viewHolder)
+    private static void setViewColor(int position, View rowView, ViewHolder viewHolder)
     {
         if (position % 2 == 0)
         {
@@ -147,36 +168,39 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         }
     }
 
-    private View.OnClickListener getIncResetTimeClickListener()
+    private static void setResetPickers(ViewHolder viewHolder)
     {
-        return new View.OnClickListener()
+        long timeSeconds = TimeUnit.MILLISECONDS.toSeconds(viewHolder.student.getResetTime());
+        viewHolder.minPicker.setValue((int) TimeUnit.SECONDS.toMinutes(timeSeconds));
+
+        long remainderSeconds = timeSeconds % 60;
+        for (int i = 0; i < SECOND_RESET_VALUES.length; ++i)
         {
-            @Override
-            public void onClick(View v)
+            if (remainderSeconds == SECOND_RESET_VALUES[i])
             {
-                final ViewHolder holder = (ViewHolder) v.getTag();
-                Logger.log(StudentsArrayAdapter.class,
-                           "Increasing the reset time for student %s",
-                           holder.student);
-                holder.student.addToResetTime(m_timerFactory.getIncTimeAmount());
-                Utils.setTextViewToTime(holder.resetTimeTextView, holder.student.getResetTime());
+                viewHolder.secPicker.setValue(i);
+                break;
             }
-        };
+        }
     }
 
-    private View.OnClickListener getDecResetTimeClickListener()
+    private NumberPicker.OnValueChangeListener getNumberPickerListener()
     {
-        return new View.OnClickListener()
+        return new NumberPicker.OnValueChangeListener()
         {
             @Override
-            public void onClick(View v)
+            public void onValueChange(NumberPicker picker, int oldVal, int newVal)
             {
-                final ViewHolder holder = (ViewHolder) v.getTag();
+                final ViewHolder holder = (ViewHolder) picker.getTag();
                 Logger.log(StudentsArrayAdapter.class,
-                           "Decreasing the reset time for student %s",
+                           "Changing the reset time for student %s",
                            holder.student);
-                holder.student.addToResetTime(m_timerFactory.getDecTimeAmount());
-                Utils.setTextViewToTime(holder.resetTimeTextView, holder.student.getResetTime());
+
+                NumberPicker minPicker = holder.minPicker;
+                NumberPicker secPicker = holder.secPicker;
+
+                long newTime = TimeUnit.MINUTES.toSeconds(minPicker.getValue()) + SECOND_RESET_VALUES[secPicker.getValue()];
+                holder.student.setResetTime(TimeUnit.SECONDS.toMillis(newTime));
             }
         };
     }

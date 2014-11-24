@@ -30,6 +30,8 @@
     <ListView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/import_student_list"/>
+            android:scrollingCache="false"
+            android:animationCache="false"
+            android:id="@+id/inactive_student_list"/>
 
 </LinearLayout>

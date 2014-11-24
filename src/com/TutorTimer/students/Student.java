@@ -43,12 +43,11 @@ public class Student
         return m_resetTime;
     }
 
-    public void addToResetTime(long delta)
+    public void setResetTime(long newTime)
     {
-        long newResetTime = m_resetTime + delta;
-        if (newResetTime > 0)
+        if (newTime >= 0)
         {
-            m_resetTime = newResetTime;
+            m_resetTime = newTime;
         }
     }
 

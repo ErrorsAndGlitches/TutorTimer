@@ -11,31 +11,31 @@ import com.TutorTimer.ui.adapters.ActiveStudentsArrayAdapter;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
-class CurrentStudentsTab extends TutorTab
+class ActiveStudentsTab extends TutorTab
 {
     static ActionBar.Tab addCurrentStudentsTabToActionBar(ActionBar actionBar,
                                                           Activity activity,
                                                           ThreadPoolExecutor threadPool)
     {
         ActionBar.Tab tab = actionBar.newTab();
-        tab.setText(activity.getResources().getString(R.string.current_students_tab_name));
-        tab.setTabListener(new CurrentStudentsTab(activity, threadPool));
+        tab.setText(activity.getResources().getString(R.string.active_students_tab_name));
+        tab.setTabListener(new ActiveStudentsTab(activity, threadPool));
         actionBar.addTab(tab);
         return tab;
     }
 
-    private final ActiveStudentsArrayAdapter m_activeStudentsAdapter;
+    private final ActiveStudentsArrayAdapter   m_activeStudentsAdapter;
 
     @Override
     public void onTabSelected(ActionBar.Tab tab, FragmentTransaction ft)
     {
-        m_activity.setContentView(R.layout.current_students_view);
+        m_activity.setContentView(R.layout.active_students);
 
         ListView activeStudentList = (ListView) m_activity.findViewById(R.id.active_student_list);
         activeStudentList.setAdapter(m_activeStudentsAdapter);
     }
 
-    private CurrentStudentsTab(Activity activity, ThreadPoolExecutor threadPool)
+    private ActiveStudentsTab(Activity activity, ThreadPoolExecutor threadPool)
     {
         super(activity, threadPool);
 
@@ -43,7 +43,7 @@ class CurrentStudentsTab extends TutorTab
 
         // set the active students list
         m_activeStudentsAdapter = new ActiveStudentsArrayAdapter(activity,
-                                                                 R.layout.current_students_view,
+                                                                 R.layout.active_students,
                                                                  studentManager.getStudentListForType(StudentListType.ACTIVE));
         ListView activeStudentList = (ListView) activity.findViewById(R.id.active_student_list);
         activeStudentList.setAdapter(m_activeStudentsAdapter);

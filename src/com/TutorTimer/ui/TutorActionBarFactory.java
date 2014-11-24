@@ -10,14 +10,14 @@ public class TutorActionBarFactory
 {
     public static ActionBar createActionBar(Activity activity, ThreadPoolExecutor threadPool)
     {
-        activity.setContentView(R.layout.current_students_view);
+        activity.setContentView(R.layout.active_students);
         ActionBar actionBar = activity.getActionBar();
 
         actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
         actionBar.setDisplayShowTitleEnabled(false);
 
-        CurrentStudentsTab.addCurrentStudentsTabToActionBar(actionBar, activity, threadPool);
-        ImportStudentsTab.addImportStudentsTabToActionBar(actionBar, activity, threadPool);
+        ActiveStudentsTab.addCurrentStudentsTabToActionBar(actionBar, activity, threadPool);
+        InactiveStudentsTab.addImportStudentsTabToActionBar(actionBar, activity, threadPool);
         OptionsDebugTab.addOptionsDebugTabToActionBar(actionBar, activity, threadPool);
 
         return actionBar;

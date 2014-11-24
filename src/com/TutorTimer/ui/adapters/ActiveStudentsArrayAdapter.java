@@ -19,7 +19,9 @@ import java.util.concurrent.TimeUnit;
  */
 public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
 {
-    private static final int NO_TIME_LEFT_SEC = 15;
+    private static final String REMOVE_STRING             = "Remove";
+    private static final int    NO_TIME_LEFT              = 15000;
+    private static final int    RUNNING_OUT_OF_TIME_COLOR = Color.RED;
 
     public ActiveStudentsArrayAdapter(Activity activity,
                                       int resource,
@@ -56,7 +58,18 @@ public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
             student.startTimer(callback);
         }
 
+        if (isOutOfTime(student.getTimeLeft()))
+        {
+            view.setBackgroundColor(RUNNING_OUT_OF_TIME_COLOR);
+        }
+
         return view;
+    }
+
+    @Override
+    String getImportRemoveButtonText()
+    {
+        return REMOVE_STRING;
     }
 
     @Override
@@ -86,7 +99,7 @@ public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
     }
 
     @Override
-    View.OnClickListener getRemoveClickListener()
+    View.OnClickListener getImportRemoveClickListener()
     {
         return new View.OnClickListener()
         {
@@ -96,17 +109,20 @@ public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
                 ViewHolder viewHolder = (ViewHolder) v.getTag();
                 Student student = viewHolder.student;
 
-                Logger.log(View.OnClickListener.class, "Removing student %s from active to import", student);
+                Logger.log(View.OnClickListener.class, "Removing student %s from active to inactive", student);
                 student.stopTimer();
-                m_studentManager.moveStudent(StudentListType.ACTIVE, StudentListType.IMPORT, student);
+                m_studentManager.moveStudent(StudentListType.ACTIVE, StudentListType.INACTIVE, student);
             }
         };
     }
 
+    private static boolean isOutOfTime(long millis)
+    {
+        return millis <= NO_TIME_LEFT;
+    }
+
     private static class ActiveStudentCountdownCallback implements Student.CountDownCallback
     {
-        private static final int RUNNING_OUT_OF_TIME_COLOR = Color.RED;
-
         private final Activity m_activity;
         private final View     m_entryView;
         private final TextView m_timeLeftTextView;
@@ -141,9 +157,9 @@ public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
             Utils.setTextViewToTime(m_timeLeftTextView, millis);
 
             // update the color if it's running out of time
-            long timeLeftSec = TimeUnit.MILLISECONDS.toSeconds(millis);
-            if (timeLeftSec <= NO_TIME_LEFT_SEC)
+            if (isOutOfTime(millis))
             {
+                long timeLeftSec = TimeUnit.MILLISECONDS.toSeconds(millis);
                 if (timeLeftSec % 2 == 0)
                 {
                     m_entryView.setBackgroundColor(RUNNING_OUT_OF_TIME_COLOR);

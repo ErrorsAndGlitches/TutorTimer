@@ -25,7 +25,7 @@ public class StudentManager
 
     static
     {
-        s_studentListComparators.put(StudentListType.IMPORT, new StudentNameComparator());
+        s_studentListComparators.put(StudentListType.INACTIVE, new StudentNameComparator());
         s_studentListComparators.put(StudentListType.ACTIVE, new StudentTimeLeftComparator());
     }
 
@@ -41,8 +41,8 @@ public class StudentManager
 
     public enum StudentListType
     {
-        IMPORT,
         ACTIVE,
+        INACTIVE
     }
 
     public static StudentManager getInstance(Context context)
@@ -144,13 +144,13 @@ public class StudentManager
 
         if (id != -1)
         {
-            addStudentToListType(StudentListType.IMPORT, new Student(id, name, m_timerFactory.getResetDuration()));
+            addStudentToListType(StudentListType.INACTIVE, new Student(id, name, m_timerFactory.getResetDuration()));
         }
     }
 
     public boolean removeImportStudent(Student student)
     {
-        boolean studentRemoved = m_studentLists.get(StudentListType.IMPORT).remove(student);
+        boolean studentRemoved = m_studentLists.get(StudentListType.INACTIVE).remove(student);
 
         if (studentRemoved)
         {
@@ -165,7 +165,7 @@ public class StudentManager
                 transaction.endTransaction();
             }
 
-            notifyStudentListObserversForType(StudentListType.IMPORT);
+            notifyStudentListObserversForType(StudentListType.INACTIVE);
         }
 
         return studentRemoved;
@@ -184,8 +184,8 @@ public class StudentManager
             transaction.endTransaction();
         }
 
-        m_studentLists.get(StudentListType.IMPORT).clear();
-        notifyStudentListObserversForType(StudentListType.IMPORT);
+        m_studentLists.get(StudentListType.INACTIVE).clear();
+        notifyStudentListObserversForType(StudentListType.INACTIVE);
     }
 
     public void resortActiveStudentList()
@@ -230,7 +230,7 @@ public class StudentManager
 
     private void loadStudentsFromDb()
     {
-        final List<Student> studentList = m_studentLists.get(StudentListType.IMPORT);
+        final List<Student> studentList = m_studentLists.get(StudentListType.INACTIVE);
 
         DbUtils.databaseQuery(m_database, new DbUtils.QueryProcessor()
         {
@@ -247,7 +247,7 @@ public class StudentManager
             }
         });
 
-        Collections.sort(studentList, s_studentListComparators.get(StudentListType.IMPORT));
+        Collections.sort(studentList, s_studentListComparators.get(StudentListType.INACTIVE));
     }
 
     private static class StudentNameComparator implements Comparator<Student>

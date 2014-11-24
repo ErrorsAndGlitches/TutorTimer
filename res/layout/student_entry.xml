@@ -5,44 +5,43 @@
                 android:layout_height="match_parent">
 
     <TextView
+            style="@style/TextSize"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:layout_alignParentLeft="true"
             android:layout_toLeftOf="@+id/time_left_for_student"
             android:id="@+id/timer_student_name"/>
 
     <TextView
+            style="@style/TextSize"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:paddingRight="20px"
-            android:layout_toLeftOf="@+id/reset_time"
-            android:id="@+id/time_left_for_student"/>
-
-    <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
             android:paddingRight="20px"
             android:layout_toLeftOf="@+id/reset_time_change_buttons"
-            android:id="@+id/reset_time"/>
+            android:id="@+id/time_left_for_student"/>
 
     <LinearLayout
             android:layout_height="wrap_content"
             android:layout_width="wrap_content"
-            android:orientation="vertical"
+            android:orientation="horizontal"
             android:layout_toLeftOf="@+id/reset_remove_buttons"
             android:id="@+id/reset_time_change_buttons">
 
-        <Button
+        <NumberPicker
+                android:id="@+id/min_reset_time_picker"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Inc"
-                android:id="@+id/increase_time_button"/>
+                android:layout_height="200px"
+                android:scaleX="0.8"
+                android:scaleY="0.8"/>
 
-        <Button
+        <NumberPicker
+                android:id="@+id/sec_reset_time_picker"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Dec"
-                android:id="@+id/decrease_time_button"/>
+                android:layout_height="200px"
+                android:scaleX="0.8"
+                android:scaleY="0.8"/>
 
     </LinearLayout>
 
@@ -63,8 +62,7 @@
         <Button
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Remove Student"
-                android:id="@+id/remove_current_student"/>
+                android:id="@+id/import_remove_current_student"/>
 
     </LinearLayout>
 
