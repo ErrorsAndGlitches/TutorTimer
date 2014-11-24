@@ -73,7 +73,7 @@ public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
     }
 
     @Override
-    View.OnClickListener getResetClickListener()
+    View.OnClickListener getResetTimeClickListener()
     {
         return new View.OnClickListener()
         {

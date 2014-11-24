@@ -42,7 +42,6 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 
         // buttons
         Button importRemoveButton;
-        Button resetTimerButton;
 
         // default color
         int defaultColor;
@@ -90,22 +89,21 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 
             // reset, remove buttons
             viewHolder.importRemoveButton = (Button) rowView.findViewById(R.id.import_remove_current_student);
-            viewHolder.resetTimerButton = (Button) rowView.findViewById(R.id.reset_timer_button);
 
             // create the click listeners
+            viewHolder.timeLeftTextView.setOnClickListener(getResetTimeClickListener());
             viewHolder.minPicker.setOnValueChangedListener(getNumberPickerListener());
             viewHolder.secPicker.setOnValueChangedListener(getNumberPickerListener());
-            viewHolder.resetTimerButton.setOnClickListener(getResetClickListener());
             viewHolder.importRemoveButton.setOnClickListener(getImportRemoveClickListener());
 
             // set the text of the start/pause button
             viewHolder.importRemoveButton.setText(getImportRemoveButtonText());
 
             // add the tags to all of the view's members
+            viewHolder.timeLeftTextView.setTag(viewHolder);
             viewHolder.minPicker.setTag(viewHolder);
             viewHolder.secPicker.setTag(viewHolder);
             viewHolder.importRemoveButton.setTag(viewHolder);
-            viewHolder.resetTimerButton.setTag(viewHolder);
 
             rowView.setTag(viewHolder);
         }
@@ -136,7 +134,7 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         return rowView;
     }
 
-    abstract View.OnClickListener getResetClickListener();
+    abstract View.OnClickListener getResetTimeClickListener();
 
     abstract View.OnClickListener getImportRemoveClickListener();
 
