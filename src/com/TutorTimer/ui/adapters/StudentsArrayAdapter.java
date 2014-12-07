@@ -110,6 +110,12 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         //
         ViewHolder viewHolder = (ViewHolder) rowView.getTag();
 
+        // clear the callback of the previous student that occupied this view so the text isn't updated from two students
+        if (viewHolder.student != null)
+        {
+            viewHolder.student.setTimerCallback(null);
+        }
+
         // set the student & count down timer
         Student student = getItem(position);
         viewHolder.student = student;
