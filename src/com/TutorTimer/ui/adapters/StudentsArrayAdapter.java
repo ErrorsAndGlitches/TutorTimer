@@ -201,7 +201,6 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         @Override
         public boolean onTouch(View v, MotionEvent event)
         {
-            Logger.log(View.OnTouchListener.class, "Received event %d", event.getAction());
             switch (event.getAction())
             {
             case MotionEvent.ACTION_DOWN:
@@ -210,7 +209,6 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
                 break;
             case MotionEvent.ACTION_MOVE:
                 float diff = event.getX(m_index) - m_startX;
-                Logger.log(View.OnTouchListener.class, "Difference: %.2f", diff);
                 if (diff > FLING_DISTANCE && m_flingListener.isRightFlingable())
                 {
                     v.startAnimation(getRightFlingAnimation(v));
