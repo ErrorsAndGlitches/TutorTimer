@@ -10,12 +10,14 @@ import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
-import android.widget.NumberPicker;
+import android.widget.Button;
 import android.widget.TextView;
 import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.R;
 import com.TutorTimer.students.Student;
 import com.TutorTimer.students.StudentManager;
+import com.TutorTimer.ui.ChangeResetTimeDialogueFactory;
+import com.TutorTimer.ui.ChangeResetTimeDialogueFactory.DialogueCallbacks;
 import com.TutorTimer.utils.TimerFactory;
 import com.TutorTimer.utils.Utils;
 
@@ -24,8 +26,6 @@ import java.util.concurrent.TimeUnit;
 
 abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 {
-    private static final String[] SECOND_RESET_STRINGS = {"00", "30"};
-    private static final long[]   SECOND_RESET_VALUES  = {0, 30};
     private static final float    FLING_DISTANCE       = 100.0f;
 
     static interface FlingListener
@@ -50,9 +50,8 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         TextView studentNameTextView;
         TextView timeLeftTextView;
 
-        // reset time pickers
-        NumberPicker minPicker;
-        NumberPicker secPicker;
+        // reset time button - tap to open reset time dialogue
+        Button resetTimeButton;
 
         // default color
         int defaultColor;
@@ -88,25 +87,16 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
             viewHolder.studentNameTextView = (TextView) rowView.findViewById(R.id.timer_student_name);
             viewHolder.timeLeftTextView = (TextView) rowView.findViewById(R.id.time_left_for_student);
 
-            // reset time pickers
-            viewHolder.minPicker = (NumberPicker) rowView.findViewById(R.id.min_reset_time_picker);
-            viewHolder.secPicker = (NumberPicker) rowView.findViewById(R.id.sec_reset_time_picker);
-
-            viewHolder.minPicker.setMinValue(0);
-            viewHolder.minPicker.setMaxValue(60);
-            viewHolder.secPicker.setMinValue(0);
-            viewHolder.secPicker.setMaxValue(1);
-            viewHolder.secPicker.setDisplayedValues(SECOND_RESET_STRINGS);
+            // button to click to change the reset time
+            viewHolder.resetTimeButton = (Button) rowView.findViewById(R.id.set_reset_time_button);
 
             // create the click listeners
             viewHolder.timeLeftTextView.setOnClickListener(getResetTimeClickListener());
-            viewHolder.minPicker.setOnValueChangedListener(getNumberPickerListener());
-            viewHolder.secPicker.setOnValueChangedListener(getNumberPickerListener());
+            viewHolder.resetTimeButton.setOnClickListener(getChangeResetTimeClickListener());
 
             // add the tags to all of the view's members
             viewHolder.timeLeftTextView.setTag(viewHolder);
-            viewHolder.minPicker.setTag(viewHolder);
-            viewHolder.secPicker.setTag(viewHolder);
+            viewHolder.resetTimeButton.setTag(viewHolder);
 
             rowView.setTag(viewHolder);
         }
@@ -129,7 +119,7 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 
         // set the time left and reset time
         Utils.setTextViewToTime(viewHolder.timeLeftTextView, student.getTimeLeft());
-        setResetPickers(viewHolder);
+        Utils.setTextViewToTime(viewHolder.resetTimeButton, student.getResetTime());
 
         // set the color of the parent view and save in view holder
         setViewColor(position, rowView, viewHolder);
@@ -169,39 +159,35 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         }
     }
 
-    private static void setResetPickers(ViewHolder viewHolder)
+    private View.OnClickListener getChangeResetTimeClickListener()
     {
-        long timeSeconds = TimeUnit.MILLISECONDS.toSeconds(viewHolder.student.getResetTime());
-        viewHolder.minPicker.setValue((int) TimeUnit.SECONDS.toMinutes(timeSeconds));
-
-        long remainderSeconds = timeSeconds % 60;
-        for (int i = 0; i < SECOND_RESET_VALUES.length; ++i)
-        {
-            if (remainderSeconds == SECOND_RESET_VALUES[i])
-            {
-                viewHolder.secPicker.setValue(i);
-                break;
-            }
-        }
-    }
-
-    private NumberPicker.OnValueChangeListener getNumberPickerListener()
-    {
-        return new NumberPicker.OnValueChangeListener()
+        return new View.OnClickListener()
         {
             @Override
-            public void onValueChange(NumberPicker picker, int oldVal, int newVal)
+            public void onClick(View v)
             {
-                final ViewHolder holder = (ViewHolder) picker.getTag();
-                Logger.log(StudentsArrayAdapter.class,
-                           "Changing the reset time for student %s",
-                           holder.student);
+                final ViewHolder holder = (ViewHolder) v.getTag();
+                DialogueCallbacks callbacks = new DialogueCallbacks()
+                {
+                    @Override
+                    public void onOkayClicked(long min, long sec)
+                    {
+                        long newTime = TimeUnit.SECONDS.toMillis(TimeUnit.MINUTES.toSeconds(min) + sec);
+                        Logger.log(StudentsArrayAdapter.class,
+                                   "Changing the reset time for student %s to %dms",
+                                   holder.student, newTime);
+                        holder.student.setResetTime(newTime);
+                        Utils.setTextViewToTime(holder.resetTimeButton, newTime);
+                    }
 
-                NumberPicker minPicker = holder.minPicker;
-                NumberPicker secPicker = holder.secPicker;
+                    @Override
+                    public void onCancelClicked()
+                    {
+                        // do nothing
+                    }
+                };
 
-                long newTime = TimeUnit.MINUTES.toSeconds(minPicker.getValue()) + SECOND_RESET_VALUES[secPicker.getValue()];
-                holder.student.setResetTime(TimeUnit.SECONDS.toMillis(newTime));
+                ChangeResetTimeDialogueFactory.getResetDialogue(m_activity, holder.student.getResetTime(), callbacks).show();
             }
         };
     }

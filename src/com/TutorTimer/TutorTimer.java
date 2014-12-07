@@ -6,8 +6,8 @@ import android.view.View;
 import android.widget.EditText;
 import com.TutorTimer.Logger.Logger;
 import com.TutorTimer.students.StudentManager;
-import com.TutorTimer.utils.TimerFactory;
 import com.TutorTimer.ui.TutorActionBarFactory;
+import com.TutorTimer.utils.TimerFactory;
 import com.TutorTimer.utils.Utils;
 
 import java.util.concurrent.LinkedBlockingQueue;
@@ -54,7 +54,7 @@ public class TutorTimer extends Activity
                 String numStudentsStr = numStudentsView.getText().toString();
 
                 int numStudentsToAdd = 0;
-                if (numStudentsStr != null && numStudentsStr.length() != 0)
+                if (numStudentsStr.length() != 0)
                 {
                     try
                     {
@@ -62,7 +62,9 @@ public class TutorTimer extends Activity
                     }
                     catch (NumberFormatException e)
                     {
-                        Utils.longToast(TutorTimer.this, "Could not create debug students; invalid arg %s", numStudentsStr);
+                        Utils.longToast(TutorTimer.this,
+                                        "Could not create debug students; invalid arg %s",
+                                        numStudentsStr);
                     }
 
                     numStudentsToAdd = Math.max(numStudentsToAdd, 0);
