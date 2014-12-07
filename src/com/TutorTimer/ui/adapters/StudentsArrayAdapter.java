@@ -21,12 +21,14 @@ import com.TutorTimer.ui.ChangeResetTimeDialogueFactory.DialogueCallbacks;
 import com.TutorTimer.utils.TimerFactory;
 import com.TutorTimer.utils.Utils;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
 {
-    private static final float    FLING_DISTANCE       = 100.0f;
+    private static final float FLING_DISTANCE = 100.0f;
 
     static interface FlingListener
     {
@@ -57,9 +59,10 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         int defaultColor;
     }
 
-    final Activity       m_activity;
-    final StudentManager m_studentManager;
-    final TimerFactory   m_timerFactory;
+    final         Activity               m_activity;
+    final         StudentManager         m_studentManager;
+    final         TimerFactory           m_timerFactory;
+    private final Map<Student, TextView> m_currentTextViewUpdated;
 
     public StudentsArrayAdapter(Activity activity,
                                 int resource,
@@ -69,6 +72,7 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         m_activity = activity;
         m_studentManager = StudentManager.getInstance(activity);
         m_timerFactory = TimerFactory.getInstance(activity);
+        m_currentTextViewUpdated = new HashMap<Student, TextView>();
     }
 
     @Override
@@ -110,6 +114,13 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         //
         ViewHolder viewHolder = (ViewHolder) rowView.getTag();
 
+        // check if the text view is already being used by a student from view recycling
+        TextView textView = m_currentTextViewUpdated.get(viewHolder.student);
+        if (textView != null && textView == viewHolder.timeLeftTextView)
+        {
+            viewHolder.student.setTimerCallback(null);
+        }
+
         // set the student & count down timer
         Student student = getItem(position);
         viewHolder.student = student;
@@ -125,6 +136,9 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
         setViewColor(position, rowView, viewHolder);
 
         rowView.setOnTouchListener(new FlingTouchListener());
+
+        // update the text view to student mapping
+        m_currentTextViewUpdated.put(student, viewHolder.timeLeftTextView);
 
         return rowView;
     }
@@ -187,7 +201,9 @@ abstract class StudentsArrayAdapter extends ArrayAdapter<Student>
                     }
                 };
 
-                ChangeResetTimeDialogueFactory.getResetDialogue(m_activity, holder.student.getResetTime(), callbacks).show();
+                ChangeResetTimeDialogueFactory.getResetDialogue(m_activity,
+                                                                holder.student.getResetTime(),
+                                                                callbacks).show();
             }
         };
     }

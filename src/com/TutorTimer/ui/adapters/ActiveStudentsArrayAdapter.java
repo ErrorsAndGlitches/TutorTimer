@@ -19,8 +19,8 @@ import java.util.concurrent.TimeUnit;
  */
 public class ActiveStudentsArrayAdapter extends StudentsArrayAdapter
 {
-    private static final int    NO_TIME_LEFT              = 15000;
-    private static final int    RUNNING_OUT_OF_TIME_COLOR = Color.RED;
+    private static final int NO_TIME_LEFT              = 15000;
+    private static final int RUNNING_OUT_OF_TIME_COLOR = Color.RED;
 
     public ActiveStudentsArrayAdapter(Activity activity,
                                       int resource,

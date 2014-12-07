@@ -143,7 +143,7 @@ public class Student
         @Override
         public void onTick(long millisUntilFinished)
         {
-            Logger.log(this, "Updating the tick time: %d", millisUntilFinished);
+            Logger.log(this, "Updating the tick time for %s: %d", Student.this, millisUntilFinished);
             setTimeLeft(millisUntilFinished);
             if (m_callback != null)
             {
